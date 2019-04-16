@@ -1,4 +1,3 @@
-import getchar
 from constant import *
 
 
