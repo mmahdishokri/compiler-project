@@ -78,11 +78,13 @@ def get_next_state(state, c):
 
 
 def is_accept(state):
-    return True
+    return state in ACCEPT_STATES
 
 
 def get_type(state, word):
-    return 1
+    if STATE_TYPE[state] == 'ID' and word in KEYWORDS:
+        return 'KEYWORD'
+    return STATE_TYPE[state]
 
 
 def get_next_token(state, word_wrapper, tokens, errors):
@@ -133,8 +135,8 @@ while state != EOF:
 print("Tokens:")
 for token in tokens:
     print(token[0], token[1])
-    if not isblank(token[1][0]):
-        output_file.write(str(token) + " ")
+    if not token[0] in ['WHITESPACE', 'COMMENT',]:
+        output_file.write('(' + token[0] + ', ' + token[1] + ') ')
     if token[1] == '\n':
         output_file.write("\n")
 output_file.close()

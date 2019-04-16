@@ -13,4 +13,16 @@ CMT6 = 10
 WHS = 11
 NUM = 12
 ID = 13
-
+ACCEPT_STATES = [EOF, SYM, SYM2, SYM3, CMT5, CMT6, WHS, NUM, ID]
+STATE_TYPE = {
+    EOF: 'EOF',
+    SYM: 'SYMBOL',
+    SYM2: 'SYMBOL',
+    SYM3: 'SYMBOL',
+    CMT5: 'COMMENT',
+    CMT6: 'COMMENT',
+    WHS: 'WHITESPACE',
+    NUM: 'NUM',
+    ID: 'ID',
+}
+KEYWORDS = ['if', 'else', 'void', 'int', 'while', 'break', 'continue', 'switch', 'default', 'case', 'return',]
