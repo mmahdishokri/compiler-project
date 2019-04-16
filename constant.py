@@ -1,3 +1,4 @@
+ACCEPT_STATE = 1
 START = 0
 EOF = 1
 SYM = 2
