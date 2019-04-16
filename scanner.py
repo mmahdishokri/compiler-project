@@ -4,11 +4,14 @@ from constant import *
 def isblank(c):
     return ord(c) == 32 or ord(c) == 10 or ord(c) == 13 or ord(c) == 9 or ord(c) == 11 or ord(c) == 12
 
+
 def isnum(c):
     return ord('9') >= ord(c) >= ord('0')
 
+
 def issymb(c):
     return c == '=' or c == ';' or c == ':' or c == ',' or c == '[' or c == ']' or c == '(' or c == ')' or c == '{' or c == '}' or c == '+' or c == '-' or c == '*' or c == '<'
+
 
 def get_next_state(state, c):
     if state == START:
@@ -58,6 +61,7 @@ def get_next_state(state, c):
 
     return -1
 
+
 def get_next_token(state, word_wrapper, tokens):
     word = word_wrapper[0]
     c = code.read(1)
@@ -66,15 +70,19 @@ def get_next_token(state, word_wrapper, tokens):
     tokens.append(word)
     return next_state
 
+
 print("Hello! I am your scanner ^_^")
 
-code = open("code.c", "r")
-output = open("scanner.txt")
-errors = open("lexical_errors.txt")
+c = input()
+print(ord(c))
 
-tokens = []
-state = 0
-word_wrapper = [""]
-
-while state != EOF:
-    state = get_next_token(state, word_wrapper, tokens)
+# code = open("code.c", "r")
+# output = open("scanner.txt")
+# errors = open("lexical_errors.txt")
+#
+# tokens = []
+# state = 0
+# word_wrapper = [""]
+#
+# while state != EOF:
+#     state = get_next_token(state, word_wrapper, tokens)
