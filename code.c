@@ -8,4 +8,10 @@ void main(void) {
 		a = 3;
 		cd!e = -7;
 	}
+	else
+	{
+	    b = a < cde;
+	    {cde = @2;
+	}}
+	return;
 }

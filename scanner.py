@@ -14,8 +14,12 @@ def issymb(c):
     return c == '=' or c == ';' or c == ':' or c == ',' or c == '[' or c == ']' or c == '(' or c == ')' or c == '{' or c == '}' or c == '+' or c == '-' or c == '*' or c == '<'
 
 
+def isalpha(c):
+    return (ord('a') <= ord(c) <= ord('z')) or (ord('A') <= ord(c) <= ord('Z'))
+
+
 def iseof(c):
-    return False
+    return c == ''
 
 
 def get_next_state(state, c):
@@ -32,10 +36,16 @@ def get_next_state(state, c):
             return SYM2
         if issymb(c):
             return SYM
+        if isalpha(c):
+            return ID
 
     if state == NUM:
         if isnum(c):
             return NUM
+
+    if state == ID:
+        if isnum(c) or isalpha(c):
+            return ID
 
     if state == CMT:
         if c == '*':
@@ -67,20 +77,25 @@ def get_next_state(state, c):
     return -1
 
 
-def get_state_type(state):
-    return ACCEPT_STATE
+def is_accept(state):
+    return True
+
+
+def get_type(state, word):
+    return 1
 
 
 def get_next_token(state, word_wrapper, tokens, errors):
     word = word_wrapper[0]
     c = code.read(1)
-    print("c = ", c)
     next_state = get_next_state(state, c)
+    print("c = ", c, end="")
+    print(", next_state = ", next_state)
     if next_state == -1:
-        if get_state_type(state) == ACCEPT_STATE:
+        if is_accept(state):
             next_state = get_next_state(START, c)
             if next_state != -1:
-                tokens.append((get_state_type(state), word))
+                tokens.append((get_type(state, word), word))
                 word = ""
                 word += c
             else:
@@ -91,27 +106,13 @@ def get_next_token(state, word_wrapper, tokens, errors):
             errors.append((word + c, "invalid input"))
             word = ""
             next_state = START
-
+    else:
+        word += c
+    word_wrapper[0] = word
     return next_state
 
 
-print("Hello! I am your scanner ^_^")
-
-c = input()
-print(ord(c))
-
-# code = open("code.c", "r")
-# output = open("scanner.txt")
-# errors = open("lexical_errors.txt")
-#
-# tokens = []
-# state = 0
-# word_wrapper = [""]
-#
-# while state != EOF:
-#     state = get_next_token(state, word_wrapper, tokens)
-
-print("Hello! I am your scanner ^_^")
+print("Hello! I am your scanner ^_O")
 
 code = open("code.c", "r")
 output_file = open("scanner.txt", "w")
@@ -132,7 +133,14 @@ while state != EOF:
 print("Tokens:")
 for token in tokens:
     print(token[0], token[1])
+    if not isblank(token[1][0]):
+        output_file.write(str(token) + " ")
+    if token[1] == '\n':
+        output_file.write("\n")
+output_file.close()
+
 
 print("Errors:")
 for error in errors:
     print(error[0], error[1])
+    error_file
