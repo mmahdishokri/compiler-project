@@ -87,30 +87,33 @@ def get_type(state, word):
     return STATE_TYPE[state]
 
 
-def get_next_token(state, word_wrapper, tokens, errors):
+def get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors):
     word = word_wrapper[0]
     c = code.read(1)
     next_state = get_next_state(state, c)
     print("c = ", c, end="")
     print(", next_state = ", next_state)
+    line_number = line_number_wrapper[0]
     if next_state == -1:
         if is_accept(state):
             next_state = get_next_state(START, c)
             if next_state != -1:
-                tokens.append((get_type(state, word), word))
+                tokens.append((line_number, get_type(state, word), word))
                 word = ""
                 word += c
             else:
-                errors.append((word + c, "invalid input"))
+                errors.append((line_number, word + c, "invalid input"))
                 word = ""
                 next_state = START
         else:
-            errors.append((word + c, "invalid input"))
+            errors.append((line_number, word + c, "invalid input"))
             word = ""
             next_state = START
     else:
         word += c
     word_wrapper[0] = word
+    if c == '\n':
+        line_number_wrapper[0] += 1
     return next_state
 
 
@@ -123,26 +126,38 @@ error_file = open("lexical_errors.txt", "w")
 tokens = []
 errors = []
 state = 0
-wrapper = [""]
+word_wrapper = [""]
+line_number_wrapper = [1]
 
 while state != EOF:
-    state = get_next_token(state, wrapper, tokens, errors)
+    state = get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors)
     print("state = ", state)
-    print("word = ", wrapper[0])
+    print("word = ", word_wrapper[0])
     print("tokens =", tokens)
     print("errors = ", errors)
 
 print("Tokens:")
+first_token_in_line = True
 for token in tokens:
     print(token[0], token[1])
-    if not token[0] in ['WHITESPACE', 'COMMENT',]:
-        output_file.write('(' + token[0] + ', ' + token[1] + ') ')
-    if token[1] == '\n':
+    if not token[1] in ['WHITESPACE', 'COMMENT']:
+        if first_token_in_line:
+            output_file.write(str(token[0]) + ". ")
+        first_token_in_line = False
+        output_file.write('(' + token[1] + ', ' + token[2] + ') ')
+    if token[2] == '\n':
         output_file.write("\n")
+        first_token_in_line = True
 output_file.close()
 
 
 print("Errors:")
+lastLine = -1
 for error in errors:
-    print(error[0], error[1])
-    error_file
+    print(error[1], error[2])
+    if lastLine != error[0]:
+        if lastLine != -1:
+            error_file.write('\n')
+        error_file.write(str(error[0]) + ". ")
+    error_file.write('(' + error[1] + ', ' + error[2] + ') ')
+    lastLine = error[0]
