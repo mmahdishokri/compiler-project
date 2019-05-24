@@ -1,0 +1,29 @@
+program				->		dec-list EOF
+dec-list			->		dec dec-list
+dec-list			-> 		ε
+dec				->		var-dec			| fun-dec
+var-dec			-> 		type-spec ID arr-spec ;
+arr-spec		->		[ NUM ]			| ε
+type-spec		-> 		int				| void
+fun-dec			->		type-spec ID (params) compound-stmt
+params			-> 		param-list		| void
+param-list		->		param param-list-exp
+param-list-exp	->		, param-list	| ε
+param			-> 		type-spec ID param-arr-spec
+param-arr-spec	->		[]				| e
+compound-stmt	-> 		{ dec-list stmt-list }
+stmt-list		-> 		stmt stmt-list	| ε
+stmt			->		exp-stmt		| compound-stmt		| selection-stmt		| iteration-stmt		| return-stmt		| switch-stmt
+exp-stmt		-> 		exp ;			| continue ;		| break ;
+selection-stmt	-> 		if ( exp ) stmt else stmt
+iteration-stmt	->		while ( exp ) stmt
+return-stmt		->		return can-void-exp ;
+can-void-exp	->		exp				| ε
+switch-stmt		->		switch ( exp ) { case-stmts def-stmt }
+case-stmts		-> 		e 				| case-stmt case-stmts
+case-stmt		-> 		case NUM : stmt-list
+def-stmt		-> 		e 				| default : stmt-list
+exp				->		var = exp		| simple-exp
+var				-> 		ID arr-exp-spec
+arr-exp-spec	-> 		[ exp] 			| ε
+simple-exp		-> 		

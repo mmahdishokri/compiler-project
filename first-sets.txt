@@ -1,0 +1,41 @@
+program	EOF, int, void
+dec-list	ε, int, void
+dec	int, void
+var-dec	int, void
+arr-spec	[, ε
+type-spec	int, void
+fun-dec	int, void
+params	void, int
+param-list	int, void
+param-list-exp	,, ε
+param	int, void
+param-arr-spec	[], e
+compound-stmt	{
+stmt-list	ε, {, continue, break, if, while, return, switch, ID, +, -, (, NUM
+stmt	{, continue, break, if, while, return, switch, ID, +, -, (, NUM
+exp-stmt	continue, break, ID, +, -, (, NUM
+selection-stmt	if
+iteration-stmt	while
+return-stmt	return
+can-void-exp	ε, ID, +, -, (, NUM
+switch-stmt	switch
+case-stmts	ε, case
+case-stmt	case
+def-stmt	ε, default
+exp	ID, +, -, (, NUM
+var	ID
+arr-exp-spec	[, ε
+simple-exp	+, -, (, ID, NUM
+simple-exp-suff	ε, <, ==
+relop	<, ==
+additive-exp	+, -, (, ID, NUM
+additive-exp-suf	ε, +, -
+addop	+, -
+term	+, -, (, ID, NUM
+term-suff	*, ε
+signed-factor	+, -, (, ID, NUM
+factor	(, ID, NUM
+call	ID
+args	ε, ID, +, -, (, NUM
+arg-list	ID, +, -, (, NUM
+arg-list-suff	,, ε

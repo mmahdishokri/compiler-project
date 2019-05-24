@@ -1,0 +1,41 @@
+program	-|
+dec-list	EOF, {, continue, break, if, while, return, switch, ID, +, -, (, NUM, }
+dec	int, void, EOF, {, continue, break, if, while, return, switch, ID, +, -, (, NUM, }
+var-dec	int, void, EOF, {, continue, break, if, while, return, switch, ID, +, -, (, NUM, }
+arr-spec	;
+type-spec	ID
+fun-dec	int, void, EOF, {, continue, break, if, while, return, switch, ID, +, -, (, NUM, }
+params	
+param-list	
+param-list-exp	
+param	,
+param-arr-spec	,
+compound-stmt	int, void, EOF, {, continue, break, if, while, return, switch, ID, +, -, (, NUM, }, else, case, default
+stmt-list	}, case, default
+stmt	{, continue, break, if, while, return, switch, ID, +, -, (, NUM, }, else, case, default
+exp-stmt	{, continue, break, if, while, return, switch, ID, +, -, (, NUM, }, else, case, default
+selection-stmt	{, continue, break, if, while, return, switch, ID, +, -, (, NUM, }, else, case, default
+iteration-stmt	{, continue, break, if, while, return, switch, ID, +, -, (, NUM, }, else, case, default
+return-stmt	{, continue, break, if, while, return, switch, ID, +, -, (, NUM, }, else, case, default
+can-void-exp	;
+switch-stmt	{, continue, break, if, while, return, switch, ID, +, -, (, NUM, }, else, case, default
+case-stmts	default, }
+case-stmt	case, default, }
+def-stmt	}
+exp	;, ), ,
+var	=, *, +, -, <, ==, ;, ), ,
+arr-exp-spec	=, *, +, -, <, ==, ;, ), ,
+simple-exp	;, ), ,
+simple-exp-suff	;, ), ,
+relop	+, -, (, ID, NUM
+additive-exp	<, ==, ;, ), ,
+additive-exp-suf	<, ==, ;, ), ,
+addop	+, -, (, ID, NUM
+term	+, -, <, ==, ;, ), ,
+term-suff	+, -, <, ==, ;, ), ,
+signed-factor	*, +, -, <, ==, ;, ), ,
+factor	*, +, -, <, ==, ;, ), ,
+call	*, +, -, <, ==, ;, ), ,
+args	)
+arg-list	)
+arg-list-suff	)

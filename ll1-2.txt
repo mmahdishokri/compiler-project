@@ -1,0 +1,73 @@
+program			->		dec-list EOF
+dec-list		->		dec dec-list
+dec-list		-> 		ε
+dec				->		var-dec
+dec				->		fun-dec
+var-dec			-> 		type-spec ID arr-spec ;
+arr-spec		->		[ NUM ]
+arr-spec 		->		ε
+type-spec		-> 		int
+type-spec		->		void
+fun-dec			->		type-spec ID (params) compound-stmt
+params			-> 		param-list
+params			->		void
+param-list		->		param param-list-exp
+param-list-exp	->		, param-list
+param-list-exp	->		ε
+param			-> 		type-spec ID param-arr-spec
+param-arr-spec	->		[]
+param-arr-spec	->		e
+compound-stmt	-> 		{ dec-list stmt-list }
+stmt-list		-> 		stmt stmt-list
+stmt-list		-> 		ε
+stmt			->		exp-stmt
+stmt			->		compound-stmt
+stmt			->		selection-stmt
+stmt			->		iteration-stmt
+stmt			->		return-stmt
+stmt			->		switch-stmt
+exp-stmt		-> 		exp ;
+exp-stmt		-> 		continue ;
+exp-stmt		-> 		break ;
+selection-stmt	-> 		if ( exp ) stmt else stmt
+iteration-stmt	->		while ( exp ) stmt
+return-stmt		->		return can-void-exp ;
+can-void-exp	->		exp
+can-void-exp	->		ε
+switch-stmt		->		switch ( exp ) { case-stmts def-stmt }
+case-stmts		-> 		ε 
+case-stmts		->		case-stmt case-stmts
+case-stmt		-> 		case NUM : stmt-list
+def-stmt		-> 		ε
+def-stmt		->		default : stmt-list
+exp				->		var = exp
+exp				->		simple-exp
+var				-> 		ID arr-exp-spec
+arr-exp-spec	-> 		[ exp] 
+arr-exp-spec	->		ε
+simple-exp		-> 		additive-exp simple-exp-suff
+simple-exp-suff	->		relop additive-exp
+simple-exp-suff	->		ε
+relop			->		<
+relop			->		==
+additive-exp	->		term additive-exp-suf
+additive-exp-suf->		addop additive-exp
+additive-exp-suf-> 		ε
+addop			->		+
+addop			->		-
+term			-> 		signed-factor term-suff
+term-suff		->		* term
+term-suff		->		ε
+signed-factor	->		factor
+signed-factor	->		+ factor
+signed-factor	->		- factor
+factor			->		( exp )
+factor			->		var
+factor			->		call
+factor			->		NUM
+call			->		ID ( args )
+args			-> 		arg-list
+args			->		ε
+arg-list		->		exp arg-list-suff
+arg-list-suff	->		, arg-list
+arg-list-suff	->		ε

@@ -143,6 +143,7 @@ def match_rule(token, rule):
             return False
     return False
 
+
 def parse_rule(rule, token):
     for e in rule:
         if e in terminals:
@@ -160,6 +161,7 @@ def parse_rule(rule, token):
         else:
             print("PANIC")
             raise Exception("rule exception")
+
 
 def parse_non_terminal(A, token):
     if EPS in First[A] and token in Follow[A]:
