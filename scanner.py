@@ -1,6 +1,5 @@
 from constant import *
 
-
 def isblank(c):
     return ord(c) == 32 or ord(c) == 10 or ord(c) == 13 or ord(c) == 9 or ord(c) == 11 or ord(c) == 12
 
@@ -90,8 +89,8 @@ def get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors):
     word = word_wrapper[0]
     c = code.read(1)
     next_state = get_next_state(state, c)
-    print("c = ", c, end="")
-    print(", next_state = ", next_state)
+    # print("c = ", c, end="")
+    # print(", next_state = ", next_state)
     line_number = line_number_wrapper[0]
     if next_state == -1:
         if is_accept(state):
@@ -101,11 +100,11 @@ def get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors):
                 word = ""
                 word += c
             else:
-                errors.append((line_number, word + c, "invalid input"))
+                errors.append((line_number, "Invalid input", word + c))
                 word = ""
                 next_state = START
         else:
-            errors.append((line_number, word + c, "invalid input"))
+            errors.append((line_number, "Invalid input", word + c))
             word = ""
             next_state = START
     else:
@@ -117,23 +116,104 @@ def get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors):
 
 
 print("Hello! I am your scanner ^_O")
-
 code = open("code.c", "r")
-output_file = open("scanner.txt", "w")
-error_file = open("lexical_errors.txt", "w")
-
 tokens = []
 errors = []
 state = 0
 word_wrapper = [""]
 line_number_wrapper = [1]
 
-while state != EOF:
-    state = get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors)
-    print("state = ", state)
-    print("word = ", word_wrapper[0])
-    print("tokens =", tokens)
-    print("errors = ", errors)
+def read_token():
+    global state
+    l = len(tokens)
+    while len(tokens) == l:
+        state = get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors)
+    return tokens[-1]
+
+def match_terminal(token, e):
+    return token[2] == e if token[1] == 'SYMBOL' else token[1] == e
+
+def match_rule(token, rule):
+    for r in rule:
+        if r in terminals:
+            return match_terminal(token, r)
+        if token in First[r]:
+            return True
+        if not EPS in First[r]:
+            return False
+    return False
+
+def parse_rule(rule, token):
+    for e in rule:
+        if e in terminals:
+            if match_terminal(token, e):
+                token = read_token()
+            else:
+                errors.append((token[0], "Syntax error", 'Missing ' + e))
+        elif e in non_terminals:
+            while not token in First[e] and not token in Follow[e]:
+                errors.append((token[0], "Syntax error", 'Unexpected ' + token[2]))
+                token = read_token()
+            if not token in First[e] and not EPS in First[e]:
+                errors.append((token[0], "Syntax error", 'Missing ' + e))
+            parse_non_terminal(e)
+        else:
+            print("PANIC")
+            raise Exception("rule exception")
+
+def parse_non_terminal(A, token):
+    if EPS in First[A] and token in Follow[A]:
+        return
+    for r in Rules[A]:
+        if match_rule(token, r):
+            parse_rule(r, token)
+            return
+    print("PANIC")
+    raise Exception("non terminal exception")
+
+
+# stack = [start[S]]
+# while len(stack) > 0:
+#     fin = False
+#     cur = stack[-1]
+#     if is_finish[cur]:
+#         stack.pop()
+#         continue
+#     for term in go[cur]:
+#         if token == term:
+#             fin = True
+#             stack[-1] = go[cur][term]
+#             state = get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors)
+#             token = tokens[-1]
+#             break
+#     if fin:
+#         continue
+#     for non_term in Go[cur]:
+#         if token in First[non_term] or (EPS in First[non_term] and token in Follow[non_term]):
+#             fin = True
+#             #stack[-1] = Go[cur][non_term]
+#             stack.append(start[non_term])
+#     if fin:
+#         continue
+#     if EPS in Go[cur] and token in Follow[owner[cur]]:
+#         stack[-1] = go[cur][EPS]
+#         fin = True
+#     if not fin:
+#         print("Error")
+#
+
+
+# while state != EOF:
+#     read_token()
+#     print("state = ", state)
+#     print("word = ", word_wrapper[0])
+#     print("tokens =", tokens)
+#     print("errors = ", errors)
+
+parse_non_terminal('program', read_token())
+
+output_file = open("scanner.txt", "w")
+error_file = open("errors.txt", "w")
 
 print("Tokens:")
 first_token_in_line = True
@@ -157,6 +237,7 @@ for error in errors:
     if lastLine != error[0]:
         if lastLine != -1:
             error_file.write('\n')
-        error_file.write(str(error[0]) + ". ")
-    error_file.write('(' + error[1] + ', ' + error[2] + ') ')
+        error_file.write('#' + str(error[0]) + ': ')
+    error_file.write(error[1] + '! ' + error[2])
     lastLine = error[0]
+

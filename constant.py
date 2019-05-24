@@ -26,3 +26,15 @@ STATE_TYPE = {
     ID: 'ID',
 }
 KEYWORDS = ['if', 'else', 'void', 'int', 'while', 'break', 'continue', 'switch', 'default', 'case', 'return',]
+terminals = []
+non_terminals = []
+EPS = 'ε'
+First = {
+
+}
+Follow = {
+    
+}
+Rules = {
+
+}
