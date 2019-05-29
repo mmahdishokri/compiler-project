@@ -157,7 +157,7 @@ def parse_rule(rule, token):
                 token = read_token()
             if not token in First[e] and not EPS in First[e]:
                 errors.append((token[0], "Syntax error", 'Missing ' + e))
-            parse_non_terminal(e)
+            parse_non_terminal(e, token)
         else:
             print("PANIC")
             raise Exception("rule exception")

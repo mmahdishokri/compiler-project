@@ -56,8 +56,8 @@ additive-exp-suf-> 		ε
 addop			->		+
 addop			->		-
 term			-> 		signed-factor term-suff
-term-suff		->		* term
-term-suff		->		ε
+term-suffix		->		* term
+term-suffix		->		ε
 signed-factor	->		factor
 signed-factor	->		+ factor
 signed-factor	->		- factor
@@ -69,5 +69,5 @@ call			->		ID ( args )
 args			-> 		arg-list
 args			->		ε
 arg-list		->		exp arg-list-suff
-arg-list-suff	->		, arg-list
-arg-list-suff	->		ε
+arg-list-suffix	->		, arg-list
+arg-list-suffix	->		ε
