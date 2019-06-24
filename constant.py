@@ -26,15 +26,67 @@ STATE_TYPE = {
     ID: 'ID',
 }
 KEYWORDS = ['if', 'else', 'void', 'int', 'while', 'break', 'continue', 'switch', 'default', 'case', 'return',]
-terminals = []
-non_terminals = []
 EPS = 'ε'
-First = {
+START_NON_TERMINAL = 'program'
 
-}
-Follow = {
-    
-}
-Rules = {
+Rules = {}
+f = open('ll1-2.txt', 'r')
+for line in f:
+    lhs, rhs = map(str.strip, line.split('->'))
+    Rules.setdefault(lhs, []).append(rhs.split(' '))
+non_terminals = list(Rules.keys())
+terminals = []
+for rules in Rules.values():
+    for rule in rules:
+        for r in rule:
+            if not r in terminals and not r in non_terminals:
+                terminals.append(r)
+print(non_terminals)
+print(terminals)
 
-}
+First = {}
+for t in terminals:
+    First[t] = [t]
+fin = False
+while not fin:
+    fin = True
+    for X in non_terminals:
+        for rule in Rules[X]:
+            f = True
+            for r in rule:
+                if not EPS in First.setdefault(r, []):
+                    for a in First[r]:
+                        if not a in First.setdefault(X, []):
+                            First.setdefault(X, []).append(a)
+                            fin = False
+                    f = False
+                    break
+            if f and not EPS in First.setdefault(X, []):
+                First.setdefault(X, []).append(EPS)
+                fin = False
+
+Follow = {START_NON_TERMINAL : ['EOF']}
+fin = False
+while not fin:
+    fin = True
+    for A in non_terminals:
+        for rule in Rules[A]:
+            f = True
+            first = []
+            for X in reversed(rule):
+                if X in non_terminals:
+                    if f:
+                        for a in Follow[A]:
+                            if not a in Follow.setdefault(X, []):
+                                Follow.setdefault(X, []).append(a)
+                                fin = False
+                    for a in first:
+                        if a != EPS and not a in Follow.setdefault(X, []):
+                            Follow.setdefault(X, []).append(a)
+                            fin = False
+                if EPS in First[X]:
+                    first.extend(First[X])
+                else:
+                    first = First[X].copy()
+                    f = False
+print(Follow['dec-list'])

@@ -8,7 +8,7 @@ arr-spec		->		[ NUM ]
 arr-spec 		->		ε
 type-spec		-> 		int
 type-spec		->		void
-fun-dec			->		type-spec ID (params) compound-stmt
+fun-dec			->		type-spec ID ( params ) compound-stmt
 params			-> 		param-list
 params			->		void
 param-list		->		param param-list-exp
@@ -43,7 +43,7 @@ def-stmt		->		default : stmt-list
 exp				->		var = exp
 exp				->		simple-exp
 var				-> 		ID arr-exp-spec
-arr-exp-spec	-> 		[ exp] 
+arr-exp-spec	-> 		[ exp ]
 arr-exp-spec	->		ε
 simple-exp		-> 		additive-exp simple-exp-suff
 simple-exp-suff	->		relop additive-exp
@@ -55,7 +55,7 @@ additive-exp-suf->		addop additive-exp
 additive-exp-suf-> 		ε
 addop			->		+
 addop			->		-
-term			-> 		signed-factor term-suff
+term			-> 		signed-factor term-suffix
 term-suffix		->		* term
 term-suffix		->		ε
 signed-factor	->		factor
@@ -68,6 +68,6 @@ factor			->		NUM
 call			->		ID ( args )
 args			-> 		arg-list
 args			->		ε
-arg-list		->		exp arg-list-suff
+arg-list		->		exp arg-list-suffix
 arg-list-suffix	->		, arg-list
 arg-list-suffix	->		ε

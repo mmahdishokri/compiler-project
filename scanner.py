@@ -115,60 +115,69 @@ def get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors):
     return next_state
 
 
-print("Hello! I am your scanner ^_O")
-code = open("code.c", "r")
-tokens = []
-errors = []
-state = 0
-word_wrapper = [""]
-line_number_wrapper = [1]
-
 def read_token():
     global state
     l = len(tokens)
-    while len(tokens) == l:
+    while len(tokens) == l or tokens[-1][1] == 'WHITESPACE':
         state = get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors)
     return tokens[-1]
 
+def token_value(token):
+    return token[2] if (token[1] in ['SYMBOL', 'KEYWORD']) else token[1]
+
 def match_terminal(token, e):
-    return token[2] == e if token[1] == 'SYMBOL' else token[1] == e
+    return token_value(token) == e
 
 def match_rule(token, rule):
     for r in rule:
         if r in terminals:
             return match_terminal(token, r)
-        if token in First[r]:
+        if token_value(token) in First[r]:
             return True
         if not EPS in First[r]:
             return False
+    #TODO: token in follow of non-terminal
     return False
 
 
-def parse_rule(rule, token):
+def parse_rule(rule, token_wrapper, depth):
+    token = token_wrapper[0]
     for e in rule:
         if e in terminals:
             if match_terminal(token, e):
-                token = read_token()
+                for i in range(depth+1):
+                    print('\t', end='')
+                print(token_value(token))
+                token_wrapper[0] = token = read_token()
             else:
                 errors.append((token[0], "Syntax error", 'Missing ' + e))
         elif e in non_terminals:
-            while not token in First[e] and not token in Follow[e]:
+            while not token_value(token) in First[e] and not token_value(token) in Follow[e]:
                 errors.append((token[0], "Syntax error", 'Unexpected ' + token[2]))
-                token = read_token()
-            if not token in First[e] and not EPS in First[e]:
+                token_wrapper[0] = token = read_token()
+            if not token_value(token) in First[e] and not EPS in First[e]:
                 errors.append((token[0], "Syntax error", 'Missing ' + e))
-            parse_non_terminal(e, token)
+            parse_non_terminal(e, token_wrapper, depth+1)
+            token = token_wrapper[0]
         else:
             print("PANIC")
             raise Exception("rule exception")
 
 
-def parse_non_terminal(A, token):
-    if EPS in First[A] and token in Follow[A]:
+def parse_non_terminal(A, token_wrapper, depth=0):
+    for i in range(depth):
+        print('\t', end='')
+    print(A)
+    token = token_wrapper[0]
+    #TODO: handle by edge
+    if EPS in First[A] and token_value(token) in Follow[A]:
+        for i in range(depth+1):
+            print('\t', end='')
+        print(EPS)
         return
     for r in Rules[A]:
         if match_rule(token, r):
-            parse_rule(r, token)
+            parse_rule(r, token_wrapper, depth)
             return
     print("PANIC")
     raise Exception("non terminal exception")
@@ -204,29 +213,36 @@ def parse_non_terminal(A, token):
 #         print("Error")
 #
 
+print("Hello! I am your scanner ^_O")
+code = open("All Tests/Parser/Test - Parser.txt", "r")
+tokens = []
+errors = []
+state = 0
+word_wrapper = [""]
+line_number_wrapper = [1]
 
-# while state != EOF:
-#     read_token()
-#     print("state = ", state)
-#     print("word = ", word_wrapper[0])
-#     print("tokens =", tokens)
-#     print("errors = ", errors)
+#while state != EOF:
+#    print(read_token())
+    # print("state = ", state)
+    # print("word = ", word_wrapper[0])
+    # print("tokens =", tokens)
+    # print("errors = ", errors)
 
-parse_non_terminal('program', read_token())
+parse_non_terminal(START_NON_TERMINAL, [read_token()])
 
 output_file = open("scanner.txt", "w")
 error_file = open("errors.txt", "w")
 
 print("Tokens:")
 first_token_in_line = True
-for token in tokens:
-    print(token[0], token[1])
-    if not token[1] in ['WHITESPACE', 'COMMENT']:
+for my_token in tokens:
+#    print(token[0], token[1])
+    if not my_token[1] in ['WHITESPACE', 'COMMENT']:
         if first_token_in_line:
-            output_file.write(str(token[0]) + ". ")
+            output_file.write(str(my_token[0]) + ". ")
         first_token_in_line = False
-        output_file.write('(' + token[1] + ', ' + token[2] + ') ')
-    if token[2] == '\n':
+        output_file.write('(' + my_token[1] + ', ' + my_token[2] + ') ')
+    if my_token[2] == '\n':
         output_file.write("\n")
         first_token_in_line = True
 output_file.close()
