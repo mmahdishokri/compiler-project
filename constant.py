@@ -26,7 +26,7 @@ STATE_TYPE = {
     ID: 'ID',
 }
 KEYWORDS = ['if', 'else', 'void', 'int', 'while', 'break', 'continue', 'switch', 'default', 'case', 'return',]
-EPS = 'ε'
+EPS = 'eps'
 START_NON_TERMINAL = 'program'
 
 Rules = {}
