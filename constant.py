@@ -36,13 +36,19 @@ for line in f:
     Rules.setdefault(lhs, []).append(rhs.split(' '))
 non_terminals = list(Rules.keys())
 terminals = []
+action_symbols = []
 for rules in Rules.values():
     for rule in rules:
         for r in rule:
-            if not r in terminals and not r in non_terminals:
-                terminals.append(r)
+            if not r in non_terminals:
+                if r[0] != '#' and not r in terminals:
+                    terminals.append(r)
+                elif r[0] == '#' and not r in action_symbols:
+                    action_symbols.append(r)
+
 print(non_terminals)
 print(terminals)
+print(action_symbols)
 
 First = {}
 for t in terminals:
@@ -89,4 +95,3 @@ while not fin:
                 else:
                     first = First[X].copy()
                     f = False
-print(Follow['dec-list'])

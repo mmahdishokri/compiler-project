@@ -71,7 +71,6 @@ def get_next_state(state, c):
     if state == SYM2:
         if c == '=':
             return SYM3
-
     return -1
 
 
@@ -128,26 +127,39 @@ def token_value(token):
 def match_terminal(token, e):
     return token_value(token) == e
 
-def match_rule(token, rule):
+def match_rule(token, rule, A):
     for r in rule:
+        if r in action_symbols:
+            continue
         if r in terminals:
             return match_terminal(token, r)
         if token_value(token) in First[r]:
             return True
         if not EPS in First[r]:
             return False
-    #TODO: token in follow of non-terminal
-    return False
+    return token_value(token) in Follow[A]
 
+def print_node(A, depth):
+    for i in range(depth):
+        print('\t', end='')
+    print(A)
+
+def pid():
+    SS.append(findaddr())
+
+def subroutine(sym):
+    if sym == '#pid':
+        pid()
 
 def parse_rule(rule, token_wrapper, depth):
     token = token_wrapper[0]
     for e in rule:
+        if e in action_symbols:
+            subroutine(e)
+            continue
         if e in terminals:
             if match_terminal(token, e):
-                for i in range(depth+1):
-                    print('\t', end='')
-                print(token_value(token))
+                print_node(token_value(token), depth+1)
                 token_wrapper[0] = token = read_token()
             else:
                 errors.append((token[0], "Syntax error", 'Missing ' + e))
@@ -165,68 +177,24 @@ def parse_rule(rule, token_wrapper, depth):
 
 
 def parse_non_terminal(A, token_wrapper, depth=0):
-    for i in range(depth):
-        print('\t', end='')
-    print(A)
+    print_node(A, depth)
     token = token_wrapper[0]
-    #TODO: handle by edge
-    if EPS in First[A] and token_value(token) in Follow[A]:
-        for i in range(depth+1):
-            print('\t', end='')
-        print(EPS)
-        return
     for r in Rules[A]:
-        if match_rule(token, r):
+        if match_rule(token, r, A):
             parse_rule(r, token_wrapper, depth)
             return
     print("PANIC")
     raise Exception("non terminal exception")
 
-
-# stack = [start[S]]
-# while len(stack) > 0:
-#     fin = False
-#     cur = stack[-1]
-#     if is_finish[cur]:
-#         stack.pop()
-#         continue
-#     for term in go[cur]:
-#         if token == term:
-#             fin = True
-#             stack[-1] = go[cur][term]
-#             state = get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors)
-#             token = tokens[-1]
-#             break
-#     if fin:
-#         continue
-#     for non_term in Go[cur]:
-#         if token in First[non_term] or (EPS in First[non_term] and token in Follow[non_term]):
-#             fin = True
-#             #stack[-1] = Go[cur][non_term]
-#             stack.append(start[non_term])
-#     if fin:
-#         continue
-#     if EPS in Go[cur] and token in Follow[owner[cur]]:
-#         stack[-1] = go[cur][EPS]
-#         fin = True
-#     if not fin:
-#         print("Error")
-#
-
 print("Hello! I am your scanner ^_O")
 code = open("All Tests/Parser/Test - Parser.txt", "r")
 tokens = []
 errors = []
+SS = []
+PB = [[] for i in range(100)]
 state = 0
 word_wrapper = [""]
 line_number_wrapper = [1]
-
-#while state != EOF:
-#    print(read_token())
-    # print("state = ", state)
-    # print("word = ", word_wrapper[0])
-    # print("tokens =", tokens)
-    # print("errors = ", errors)
 
 parse_non_terminal(START_NON_TERMINAL, [read_token()])
 
