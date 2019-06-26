@@ -122,11 +122,14 @@ def read_token():
         state = get_next_token(state, word_wrapper, line_number_wrapper, tokens, errors)
     return tokens[-1]
 
+
 def token_value(token):
     return token[2] if (token[1] in ['SYMBOL', 'KEYWORD']) else token[1]
 
+
 def match_terminal(token, e):
     return token_value(token) == e
+
 
 def match_rule(token, rule):
     for r in rule:
@@ -145,8 +148,7 @@ def parse_rule(rule, token_wrapper, depth):
     for e in rule:
         if e in terminals:
             if match_terminal(token, e):
-                for i in range(depth+1):
-                    print('\t', end='')
+                print('\t' * (depth + 1), end='')
                 print(token_value(token))
                 token_wrapper[0] = token = read_token()
             else:
@@ -165,14 +167,12 @@ def parse_rule(rule, token_wrapper, depth):
 
 
 def parse_non_terminal(A, token_wrapper, depth=0):
-    for i in range(depth):
-        print('\t', end='')
+    print('\t' * depth, end='')
     print(A)
     token = token_wrapper[0]
-    #TODO: handle by edge
+    # TODO: handle by edge
     if EPS in First[A] and token_value(token) in Follow[A]:
-        for i in range(depth+1):
-            print('\t', end='')
+        print('\t' * (depth + 1), end='')
         print(EPS)
         return
     for r in Rules[A]:
@@ -214,7 +214,7 @@ def parse_non_terminal(A, token_wrapper, depth=0):
 #
 
 print("Hello! I am your scanner ^_O")
-code = open("All Tests/Parser/Test - Parser.txt", "r")
+code = open("All Tests/Parser/Test Error - Parser.txt", "r")
 tokens = []
 errors = []
 state = 0

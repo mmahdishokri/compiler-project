@@ -1,16 +1,20 @@
 program			->		dec-list EOF
 dec-list		->		dec dec-list
 dec-list		-> 		eps
-dec				->		var-dec
-dec				->		fun-dec
-var-dec			-> 		type-spec ID arr-spec ;
+dec				->		type-spec-id dec-2
+dec-2 			-> 		var-dec
+dec-2			->		fun-dec
+var-dec			-> 		arr-spec ;
+fun-dec			->		( params ) compound-stmt
+type-spec-id	->		type-spec ID
 arr-spec		->		[ NUM ]
 arr-spec 		->		eps
 type-spec		-> 		int
 type-spec		->		void
-fun-dec			->		type-spec ID ( params ) compound-stmt
-params			-> 		param-list
-params			->		void
+params			->		void void-param param-list-exp
+params			->		int ID param-list-exp
+void-param		->		eps
+void-param		->		ID
 param-list		->		param param-list-exp
 param-list-exp	->		, param-list
 param-list-exp	->		eps
@@ -40,27 +44,39 @@ case-stmts		->		case-stmt case-stmts
 case-stmt		-> 		case NUM : stmt-list
 def-stmt		-> 		eps
 def-stmt		->		default : stmt-list
-exp				->		var = exp
-exp				->		simple-exp
+exp				->		ID var-tof
+var-tof			-> 		arr-exp-spec var-tof-ari-funny
+var-tof			->		( args ) var-tof-ari-funny
+var-tof-ari-funny->		= exp
+var-tof-ari-funny->		term-suffix additive-exp-suf simple-exp-suff
+exp				->		no-var-simple-exp
 var				-> 		ID arr-exp-spec
 arr-exp-spec	-> 		[ exp ]
 arr-exp-spec	->		eps
+no-var-simple-exp->		no-var-additive-exp simple-exp-suff
 simple-exp		-> 		additive-exp simple-exp-suff
 simple-exp-suff	->		relop additive-exp
 simple-exp-suff	->		eps
 relop			->		<
 relop			->		==
+no-var-additive-exp->	no-var-term additive-exp-suf
 additive-exp	->		term additive-exp-suf
 additive-exp-suf->		addop additive-exp
 additive-exp-suf-> 		eps
 addop			->		+
 addop			->		-
+no-var-term		-> 		no-var-signed-factor term-suffix
 term			-> 		signed-factor term-suffix
 term-suffix		->		* term
 term-suffix		->		eps
+no-var-signed-factor->	no-var-factor
+no-var-signed-factor->	+ factor
+no-var-signed-factor->	- factor
 signed-factor	->		factor
 signed-factor	->		+ factor
 signed-factor	->		- factor
+no-var-factor	->		( exp )
+no-var-factor	->		NUM
 factor			->		( exp )
 factor			->		var
 factor			->		call

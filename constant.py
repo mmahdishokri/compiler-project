@@ -54,11 +54,11 @@ while not fin:
         for rule in Rules[X]:
             f = True
             for r in rule:
+                for a in First.setdefault(r, []):
+                    if a != EPS and not a in First.setdefault(X, []):
+                        First.setdefault(X, []).append(a)
+                        fin = False
                 if not EPS in First.setdefault(r, []):
-                    for a in First[r]:
-                        if not a in First.setdefault(X, []):
-                            First.setdefault(X, []).append(a)
-                            fin = False
                     f = False
                     break
             if f and not EPS in First.setdefault(X, []):
@@ -76,7 +76,7 @@ while not fin:
             for X in reversed(rule):
                 if X in non_terminals:
                     if f:
-                        for a in Follow[A]:
+                        for a in Follow.setdefault(A, []):
                             if not a in Follow.setdefault(X, []):
                                 Follow.setdefault(X, []).append(a)
                                 fin = False
@@ -89,4 +89,5 @@ while not fin:
                 else:
                     first = First[X].copy()
                     f = False
-print(Follow['dec-list'])
+
+#print(Follow['dec-list'])
