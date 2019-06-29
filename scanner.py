@@ -1,5 +1,6 @@
 from constant import *
 
+
 def isblank(c):
     return ord(c) == 32 or ord(c) == 10 or ord(c) == 13 or ord(c) == 9 or ord(c) == 11 or ord(c) == 12
 
@@ -142,6 +143,7 @@ def match_rule(token, rule, A):
             return False
     return token_value(token) in Follow[A]
 
+
 def print_node(A, depth):
     for i in range(depth):
         print('\t', end='')
@@ -165,17 +167,24 @@ def parse_rule(rule, token_wrapper, depth):
             continue
         if e in terminals:
             if match_terminal(token, e):
-                print_node(token_value(token), depth+1)
+                print_node(token_value(token), depth + 1)
                 token_wrapper[0] = token = read_token()
             else:
+                if e == EOF:
+                    errors.append((token[0], "Syntax error", 'Malfored Input'))
+                    raise Exception('EOF Error')
                 errors.append((token[0], "Syntax error", 'Missing ' + e))
         elif e in non_terminals:
-            while not token_value(token) in First[e] and not token_value(token) in Follow[e]:
+            while token_value(token) not in First[e] and (token_value(token) not in Follow[e]):
                 errors.append((token[0], "Syntax error", 'Unexpected ' + token[2]))
                 token_wrapper[0] = token = read_token()
-            if not token_value(token) in First[e] and not EPS in First[e]:
+                if token[1] == 'EOF':
+                    errors.append((token[0], "Syntax error", 'Unexpected EndOfFile'))
+                    raise Exception('EOF Error')
+            if token_value(token) not in First[e] and EPS not in First[e]:
                 errors.append((token[0], "Syntax error", 'Missing ' + e))
-            parse_non_terminal(e, token_wrapper, depth+1)
+            else:
+                parse_non_terminal(e, token_wrapper, depth + 1)
             token = token_wrapper[0]
         else:
             print("PANIC")
@@ -192,11 +201,12 @@ def parse_non_terminal(A, token_wrapper, depth=0):
         if match_rule(token, r, A):
             parse_rule(r, token_wrapper, depth)
             return
-    print("PANIC")
+    print("PANIC", A)
     raise Exception("non terminal exception")
 
+
 print("Hello! I am your scanner ^_O")
-code = open("All Tests/Parser/Test Error - Parser.txt", "r")
+code = open("All Tests/Parser/Test Error - 2", "r")
 tokens = []
 errors = []
 SS = []
@@ -205,7 +215,10 @@ state = 0
 word_wrapper = [""]
 line_number_wrapper = [1]
 
-parse_non_terminal(START_NON_TERMINAL, [read_token()])
+try:
+    parse_non_terminal(START_NON_TERMINAL, [read_token()])
+except:
+    print('Parsing terminated due to an error.')
 
 output_file = open("scanner.txt", "w")
 error_file = open("errors.txt", "w")
@@ -213,7 +226,7 @@ error_file = open("errors.txt", "w")
 print("Tokens:")
 first_token_in_line = True
 for my_token in tokens:
-#    print(token[0], token[1])
+    # print(token[0], token[1])
     if not my_token[1] in ['WHITESPACE', 'COMMENT']:
         if first_token_in_line:
             output_file.write(str(my_token[0]) + ". ")
@@ -224,15 +237,13 @@ for my_token in tokens:
         first_token_in_line = True
 output_file.close()
 
-
 print("Errors:")
 lastLine = -1
 for error in errors:
-    print(error[1], error[2])
-    if lastLine != error[0]:
-        if lastLine != -1:
-            error_file.write('\n')
-        error_file.write('#' + str(error[0]) + ': ')
-    error_file.write(error[1] + '! ' + error[2])
+    print('#' + str(error[0]) + ': ' + error[1] + '! ' + error[2])
+    # if lastLine != error[0]:
+    #    if lastLine != -1:
+    #        error_file.write('\n')
+    error_file.write('#' + str(error[0]) + ': ')
+    error_file.write(error[1] + '! ' + error[2] + '\n')
     lastLine = error[0]
-
