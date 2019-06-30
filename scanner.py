@@ -149,24 +149,44 @@ def print_node(A, depth):
         print('\t', end='')
     print(A)
 
+SS = []
+PB = [[] for i in range(100)]
+it = 0
 
-def pid():
-    SS.append(findaddr())
+def findaddr(inp):
+    #TODO: look up the current input's address from Symbol Table
+    return -1
 
+def pid(inp):
+    SS.append(findaddr(inp))
 
-def subroutine(sym):
+def subroutine(sym, inp=None):
+    global it
     if sym == '#pid':
-        pid()
+        pid(inp)
+    if sym == '#assign':
+        PB[it] = (':=', SS[-1], SS[-2])
+        it += 1
+        SS.pop(2)
+    
+
+
 
 
 def parse_rule(rule, token_wrapper, depth):
     token = token_wrapper[0]
+    expect_id = False
     for e in rule:
         if e in action_symbols:
+            if e == '#pid':
+                expect_id = True
             subroutine(e)
             continue
+        expect_id = False
         if e in terminals:
             if match_terminal(token, e):
+                if expect_id:
+                    subroutine('#pid', token_value(token))
                 print_node(token_value(token), depth + 1)
                 token_wrapper[0] = token = read_token()
             else:
@@ -209,8 +229,6 @@ print("Hello! I am your scanner ^_O")
 code = open("All Tests/Parser/Test Error - 2", "r")
 tokens = []
 errors = []
-SS = []
-PB = [[] for i in range(100)]
 state = 0
 word_wrapper = [""]
 line_number_wrapper = [1]
