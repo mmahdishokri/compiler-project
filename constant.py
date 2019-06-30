@@ -60,6 +60,8 @@ while not fin:
         for rule in Rules[X]:
             f = True
             for r in rule:
+                if r in action_symbols:
+                    continue
                 for a in First.setdefault(r, []):
                     if a != EPS and not a in First.setdefault(X, []):
                         First.setdefault(X, []).append(a)
@@ -80,6 +82,8 @@ while not fin:
             f = True
             first = []
             for X in reversed(rule):
+                if X in action_symbols:
+                    continue
                 if X in non_terminals:
                     if f:
                         for a in Follow.setdefault(A, []):
