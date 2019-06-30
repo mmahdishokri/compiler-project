@@ -182,14 +182,13 @@ def findaddr(inp):
 def gettemp():
     global nxt_tmp
     res = nxt_tmp
-    nxt_tmp += 1
+    nxt_tmp += sizeof['int']
     return res
 
 def pid(inp):
     SS.append(findaddr(inp))
 
 def subroutine(sym, inp=None):
-    global it
     if sym == '#pid':
         pid(inp)
     if sym == '#assign':
