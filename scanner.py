@@ -150,12 +150,18 @@ def print_node(A, depth):
     print(A)
 
 SS = []
-PB = [[] for i in range(100)]
-it = 0
+PB = []
+nxt_tmp = 0
 
 def findaddr(inp):
     #TODO: look up the current input's address from Symbol Table
     return -1
+
+def gettemp():
+    global nxt_tmp
+    res = nxt_tmp
+    nxt_tmp += 1
+    return res
 
 def pid(inp):
     SS.append(findaddr(inp))
@@ -165,11 +171,13 @@ def subroutine(sym, inp=None):
     if sym == '#pid':
         pid(inp)
     if sym == '#assign':
-        PB[it] = (':=', SS[-1], SS[-2])
-        it += 1
+        PB.append((':=', SS[-1], SS[-2]))
         SS.pop(2)
-    
-
+    if sym == '#add':
+        t = gettemp()
+        PB.append(('+', SS[-1], SS[-2], t))
+        SS.pop(2)
+        SS.append(t)
 
 
 
@@ -180,9 +188,9 @@ def parse_rule(rule, token_wrapper, depth):
         if e in action_symbols:
             if e == '#pid':
                 expect_id = True
-            subroutine(e)
+            else:
+                subroutine(e)
             continue
-        expect_id = False
         if e in terminals:
             if match_terminal(token, e):
                 if expect_id:
@@ -209,6 +217,7 @@ def parse_rule(rule, token_wrapper, depth):
         else:
             print("PANIC")
             raise Exception("rule exception")
+        expect_id = False
 
 
 def parse_non_terminal(A, token_wrapper, depth=0):
