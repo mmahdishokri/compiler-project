@@ -4,7 +4,7 @@ dec-list		-> 		eps
 dec				->		type-spec-id dec-2
 dec-2 			-> 		var-dec
 dec-2			->		fun-dec
-var-dec			-> 		arr-spec ; #var-dec
+var-dec			-> 		arr-spec #var-dec ;
 fun-dec			->		( params ) #fun-dec compound-stmt
 type-spec-id	->		type-spec PID-ID
 PID-ID          ->      #pid ID

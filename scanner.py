@@ -216,7 +216,6 @@ def pid(inp):
         SS.append(SSObject((TS[-1], 'id-name'), inp))
     if pid_type == 'params':
         if TS[-1] == 'void':
-            print('Illegal type of void. for ' + str(inp))
             raise Exception('Illegal type of void. For variable: ' + str(inp))
         SS.append(SSObject((TS[-1], 'param-name'), inp))
     if pid_type == 'stmt-list':
@@ -249,6 +248,8 @@ def subroutine(sym, inp=None):
         SS.append(SSObject('cons', 1))
     if sym == '#var-dec':
         print('var dec!!', SS, PS, inp)
+        if TS[-1] == 'void':
+            raise Exception('Illegal type of void. For variable: ' + str(SS[-2].value))
         declare_int(SS[-2].value, SS[-1].value)
         SS.pop()
 

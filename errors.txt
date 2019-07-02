@@ -1,1 +1,1 @@
-#1: Semantic error! Illegal type of void. for variable: a
+#3: Semantic error! Illegal type of void. For variable: b
