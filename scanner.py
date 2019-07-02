@@ -159,9 +159,9 @@ class STObject:
         return self.type, self.address
 
 
-ST = {}
-SS = []
-PB = []
+ST = {}                 # symbol table
+SS = []                 # semantic stack
+PB = []                 # program block
 nxt_tmp = 0
 nxt_addr = 0
 sizeof = {
