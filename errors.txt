@@ -1,5 +1,2 @@
-#2: Syntax error! Unexpected (Syntax error! Unexpected voidSyntax error! Unexpected )Syntax error! Unexpected {
-#3: Syntax error! Unexpected intSyntax error! Unexpected c
-#4: Syntax error! Unexpected (Syntax error! Unexpected intSyntax error! Unexpected aSyntax error! Unexpected )Syntax error! Unexpected {
-#5: Syntax error! Unexpected aSyntax error! Unexpected =Syntax error! Unexpected aSyntax error! Unexpected *Syntax error! Unexpected -Syntax error! Unexpected 2
-#6: Syntax error! Missing EOF
+#2: Syntax error! Unexpected =
+#2: Syntax error! Missing dec-2
