@@ -159,10 +159,20 @@ class STObject:
         return self.type, self.address
 
 
+class SSObject:
+    def __init__(self, type, value):
+        self.type = type
+        self.value = value
+
+    def __str__(self):
+        return self.type, self.value
+
+
 ST = {}                 # symbol table
 SS = []                 # semantic stack
 PB = []                 # program block
-nxt_tmp = 0
+PS = []                 # parse stack
+nxt_tmp = 1000
 nxt_addr = 0
 sizeof = {
     'int': 4
@@ -193,26 +203,42 @@ def gettemp():
 
 
 def pid(inp):
-    SS.append(findaddr(inp))
+    pid_type = 'hoy'
+    for i in range(len(PS)):
+        x = PS[-i - 1]
+        if x in ['dec-list', 'param-list', 'stmt-list']:
+            pid_type = x
+            break
+    print('pid!! type = ', pid_type)
+    if pid_type == 'dec-list':
+        SS.append(SSObject('id-name', inp))
+    if pid_type == 'param-list':
+        SS.append(SSObject('param-name', inp))
+    if pid_type == 'stmt-list':
+        SS.append(SSObject(pid_type, findaddr(inp)))
 
 
 def subroutine(sym, inp=None):
+    print('subroutine!! o|^_^|o ', sym)
     if sym == '#pid':
         pid(inp)
     if sym == '#assign':
-        PB.append((':=', SS[-1], SS[-2]))
-        SS.pop(2)
+        PB.append((':=', SS[-1].value, SS[-2].value))
+        SS.pop()
+        SS.pop()
     if sym == '#add':
         t = gettemp()
-        PB.append(('+', SS[-1], SS[-2], t))
-        SS.pop(2)
-        SS.append(t)
+        PB.append(('+', SS[-1].value, SS[-2].value, t))
+        SS.pop()
+        SS.pop()
+        SS.append(SSObject('exp-addr', t))
     if sym == '#save-num':
-        SS.append(inp)
+        SS.append(SSObject('cons', inp))
     if sym == '#save-one':
-        SS.append(1)
+        SS.append(SSObject('cons', 1))
     if sym == '#var-dec':
-        declare_int(SS[-2], SS[-1])
+        print('var dec!!', SS, PS, inp)
+        declare_int(SS[-2].value, SS[-1].value)
         SS.pop()
 
 
@@ -235,11 +261,14 @@ def parse_rule(rule, token_wrapper, depth):
                 if token_value(token) == 'ID':
                     if expect_id:
                         subroutine('#pid', token[2])
-                    SS.append(token[2])
+                    else:
+                        print('Unexpected ID!! PANIC!!')
+                    # SS.append(token[2])                WHY??
                 if token_value(token) == 'NUM':
                     if expect_num:
                         subroutine('#save-num', int(token[2]))
                 print_node(token_value(token), depth + 1)
+                PS.append(token_value(token))
                 token_wrapper[0] = token = read_token()
             else:
                 if e == EOF:
@@ -267,6 +296,7 @@ def parse_rule(rule, token_wrapper, depth):
 
 def parse_non_terminal(A, token_wrapper, depth=0):
     print_node(A, depth)
+    PS.append(A)
     token = token_wrapper[0]
     # TODO: CHECK THE NEXT CONDITION!!
     # if EPS in First[A] and token_value(token) in Follow[A]:
@@ -274,6 +304,9 @@ def parse_non_terminal(A, token_wrapper, depth=0):
     for r in Rules[A]:
         if match_rule(token, r, A):
             parse_rule(r, token_wrapper, depth)
+            while PS[-1] != A:
+                PS.pop()
+            PS.pop()
             return
     print("PANIC", A)
     raise Exception("non terminal exception")
@@ -292,8 +325,8 @@ line_number_wrapper = [1]
 
 try:
     parse_non_terminal(START_NON_TERMINAL, [read_token()])
-except:
-    print('Parsing terminated due to an error.')
+except Exception as e:
+    print('Parsing terminated due to an error:', e)
 
 output_file = open("scanner.txt", "w")
 error_file = open("errors.txt", "w")
