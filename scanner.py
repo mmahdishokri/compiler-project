@@ -174,6 +174,7 @@ PB = []                 # program block
 PS = []                 # parse stack
 TS = []                 # type stack
 SC = []                 # scope stack
+FT = []                 # function table
 nxt_tmp = 1000
 nxt_addr = 0
 sizeof = {
@@ -214,7 +215,7 @@ def pid(inp, def_type = ''):
     else:
         for i in range(len(PS)):
             x = PS[-i - 1]
-            if x in ['dec-list', 'params', 'stmt-list']:
+            if x in ['dec-list', 'params', 'exp']:
                 pid_type = x
                 break
     print('pid!! type = ', pid_type)
@@ -224,8 +225,11 @@ def pid(inp, def_type = ''):
         if TS[-1] == 'void':
             raise Exception('Illegal type of void. For variable: ' + str(inp))
         SS.append(SSObject((TS[-1], 'param-name'), inp))
-    if pid_type == 'stmt-list':
-        SS.append(SSObject(pid_type, findaddr(inp)))
+    if pid_type == 'exp':
+        if inp not in FT:
+            SS.append(SSObject('var-addr', findaddr(inp)))
+        else:
+            SS.append(SSObject('fun-addr', findaddr(inp)))
 
 
 def get_val(x):
@@ -234,16 +238,25 @@ def get_val(x):
     return x.value
 
 
+def check_int(x):
+    if x.type not in ['exp-addr', 'cons', 'var-addr']:
+        raise Exception('Type mismatch in operands.')
+
+
 def subroutine(sym, inp=None):
     print('subroutine!! o|^_^|o ', sym)
     if sym == '#pid':
         pid(inp)
     if sym == '#assign':
-        PB.append(('ASSIGN', get_val(SS[-1]), SS[-2].value))
+        val = SS[-2]
+        PB.append(('ASSIGN', get_val(SS[-1]), val.value))
         SS.pop()
         SS.pop()
+        SS.append(SSObject('expr-ret', val.value))
     if sym == '#add':
         t = gettemp()
+        check_int(SS[-1])
+        check_int(SS[-2])
         PB.append(('ADD', get_val(SS[-1]), get_val(SS[-2]), t))
         SS.pop()
         SS.pop()
@@ -251,6 +264,8 @@ def subroutine(sym, inp=None):
 
     if sym == '#sub':
         t = gettemp()
+        check_int(SS[-1])
+        check_int(SS[-2])
         PB.append(('SUB', get_val(SS[-1]), get_val(SS[-2]), t))
         SS.pop()
         SS.pop()
@@ -258,11 +273,12 @@ def subroutine(sym, inp=None):
     if sym == '#negate':
         SS.append(SSObject('flag', 'negate'))
     if sym == '#do-negate':
+        check_int(SS[-1])
         if SS[-1].type == 'cons':
             t = gettemp()
             PB.append(('SUB', '#0', get_val(SS[-1]), t))
             SS.pop()
-            SS.append(SSObject('exp-ret', t))
+            SS.append(SSObject('exp-addr', t))
         else:
             PB.append(('SUB', '#0', get_val(SS[-1]), SS[-1].value))
         assert SS[-2].value == 'negate'
@@ -277,13 +293,17 @@ def subroutine(sym, inp=None):
             raise Exception('Illegal type of void. For variable: ' + str(SS[-2].value))
         declare_int(SS[-2].value, SS[-1].value)
         SS.pop()
+        SS.pop()
+    if sym == '#pop':
+        SS.pop()
     if sym == '#mult':
         t = gettemp()
+        check_int(SS[-1])
+        check_int(SS[-2])
         PB.append(('MULT', get_val(SS[-1]), get_val(SS[-2]), t))
         SS.pop()
         SS.pop()
         SS.append(SSObject('exp-addr', t))
-
 
 
 def parse_rule(rule, token_wrapper, depth):

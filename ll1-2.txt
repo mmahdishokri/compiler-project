@@ -31,7 +31,7 @@ stmt			->		selection-stmt
 stmt			->		iteration-stmt
 stmt			->		return-stmt
 stmt			->		switch-stmt
-exp-stmt		-> 		exp ;
+exp-stmt		-> 		exp ; #pop
 exp-stmt		-> 		continue ;
 exp-stmt		-> 		break ;
 selection-stmt	-> 		if ( exp ) stmt else stmt
@@ -46,11 +46,11 @@ case-stmt		-> 		case NUM : stmt-list
 def-stmt		-> 		eps
 def-stmt		->		default : stmt-list
 exp				->		PID-ID var-tof
+exp				->		no-var-simple-exp
 var-tof			-> 		arr-exp-spec var-tof-ari-funny
 var-tof			->		( args ) var-tof-ari-funny
 var-tof-ari-funny->		= exp #assign
 var-tof-ari-funny->		term-suffix additive-exp-suf simple-exp-suff
-exp				->		no-var-simple-exp
 var				-> 		PID-ID arr-exp-spec
 arr-exp-spec	-> 		[ exp ]
 arr-exp-spec	->		eps
