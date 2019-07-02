@@ -34,7 +34,7 @@ stmt			->		switch-stmt
 exp-stmt		-> 		exp ; #pop
 exp-stmt		-> 		continue ;
 exp-stmt		-> 		break ;
-selection-stmt	-> 		if ( exp ) stmt else stmt
+selection-stmt	-> 		if ( exp ) #save-pb stmt else #jpf-save stmt #jp
 iteration-stmt	->		while ( exp ) stmt
 return-stmt		->		return can-void-exp ;
 can-void-exp	->		exp

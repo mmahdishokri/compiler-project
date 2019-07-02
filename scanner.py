@@ -248,14 +248,17 @@ def check_int(x):
 
 def subroutine(sym, inp=None):
     print('subroutine!! o|^_^|o ', sym)
+
     if sym == '#pid':
         pid(inp)
+
     if sym == '#assign':
         val = SS[-2]
         PB.append(('ASSIGN', get_val(SS[-1]), get_val(val)))
         SS.pop()
         SS.pop()
         SS.append(SSObject('exp-addr', val.value, val.indirect))
+
     if sym == '#add':
         t = gettemp()
         check_int(SS[-1])
@@ -273,8 +276,10 @@ def subroutine(sym, inp=None):
         SS.pop()
         SS.pop()
         SS.append(SSObject('exp-addr', t))
+
     if sym == '#negate':
         SS.append(SSObject('flag', 'negate'))
+
     if sym == '#do-negate':
         check_int(SS[-1])
         if SS[-1].type == 'cons':
@@ -286,10 +291,13 @@ def subroutine(sym, inp=None):
             PB.append(('SUB', '#0', get_val(SS[-1]), get_val(SS[-1])))
         assert SS[-2].value == 'negate'
         SS.pop(-2)
+
     if sym == '#save-num':
         SS.append(SSObject('cons', inp))
+
     if sym == '#save-one':
         SS.append(SSObject('cons', 1))
+
     if sym == '#var-dec':
         print('var dec!!', SS, PS, inp)
         if TS[-1] == 'void':
@@ -297,8 +305,10 @@ def subroutine(sym, inp=None):
         declare_int(SS[-2].value, SS[-1].value)
         SS.pop()
         SS.pop()
+
     if sym == '#pop':
         SS.pop()
+
     if sym == '#mult':
         t = gettemp()
         check_int(SS[-1])
@@ -307,8 +317,10 @@ def subroutine(sym, inp=None):
         SS.pop()
         SS.pop()
         SS.append(SSObject('exp-addr', t))
+
     if sym == '#fun-dec-start':
         SS.append(SSObject('flag', 'params-start'))
+
     if sym == '#fun-dec-end':
         params = []
         while SS[-1].value != 'params-start':
@@ -316,6 +328,7 @@ def subroutine(sym, inp=None):
             SS.pop()
         SS.pop()
         FT[SS[-1].value] = (type, params)
+
     if sym == '#arr-ref':
         check_int(SS[-1])
         t = gettemp()
@@ -324,6 +337,20 @@ def subroutine(sym, inp=None):
         SS.pop()
         SS.pop()
         SS.append(SSObject('exp-addr', t, True))
+
+    if sym == '#save-pb':
+        SS.append(SSObject('cons', len(PB)))
+        PB.append(())
+
+    if sym == '#jpf-save':
+        PB[SS[-1].value] = ('JPF', get_val(SS[-2]), len(PB) + 1)
+        SS.pop()
+        SS.pop()
+        SS.append(SSObject('cons', len(PB)))
+        PB.append(())
+
+    if sym == '#jp':
+        PB[SS[-1].value] = ('JP', len(PB))
 
 
 def parse_rule(rule, token_wrapper, depth):
