@@ -172,6 +172,7 @@ ST = {}                 # symbol table
 SS = []                 # semantic stack
 PB = []                 # program block
 PS = []                 # parse stack
+TS = []                 # type stack
 nxt_tmp = 1000
 nxt_addr = 0
 sizeof = {
@@ -218,17 +219,23 @@ def pid(inp):
         SS.append(SSObject(pid_type, findaddr(inp)))
 
 
+def get_val(x):
+    if x.type == 'cons':
+        return '#' + str(x.value)
+    return x.value
+
+
 def subroutine(sym, inp=None):
     print('subroutine!! o|^_^|o ', sym)
     if sym == '#pid':
         pid(inp)
     if sym == '#assign':
-        PB.append((':=', SS[-1].value, SS[-2].value))
+        PB.append(('ASSIGN', get_val(SS[-1]), SS[-2].value))
         SS.pop()
         SS.pop()
     if sym == '#add':
         t = gettemp()
-        PB.append(('+', SS[-1].value, SS[-2].value, t))
+        PB.append(('ADD', SS[-1].value, SS[-2].value, t))
         SS.pop()
         SS.pop()
         SS.append(SSObject('exp-addr', t))
@@ -328,8 +335,9 @@ try:
 except Exception as e:
     print('Parsing terminated due to an error:', e)
 
-output_file = open("scanner.txt", "w")
+parser_output_file = open("scanner.txt", "w")
 error_file = open("errors.txt", "w")
+output_file = open("output.txt", "w")
 
 print("Tokens:")
 first_token_in_line = True
@@ -337,13 +345,13 @@ for my_token in tokens:
     # print(token[0], token[1])
     if not my_token[1] in ['WHITESPACE', 'COMMENT']:
         if first_token_in_line:
-            output_file.write(str(my_token[0]) + ". ")
+            parser_output_file.write(str(my_token[0]) + ". ")
         first_token_in_line = False
-        output_file.write('(' + my_token[1] + ', ' + my_token[2] + ') ')
+        parser_output_file.write('(' + my_token[1] + ', ' + my_token[2] + ') ')
     if my_token[2] == '\n':
-        output_file.write("\n")
+        parser_output_file.write("\n")
         first_token_in_line = True
-output_file.close()
+parser_output_file.close()
 
 print("Errors:")
 lastLine = -1
@@ -359,3 +367,12 @@ for error in errors:
 
 print("Program Block:")
 print(PB)
+
+command_numer = 0
+for command in PB:
+    command = list(command)
+    command.extend(['']*(4 - len(command)))
+    output_file.write(str(command_numer) + '\t(' + str(command[0]))
+    output_file.write(', ' + str(command[1]))
+    output_file.write(', ' + str(command[2]))
+    output_file.write(', ' + str(command[3]) + ')\n')
