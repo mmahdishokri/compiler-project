@@ -169,12 +169,12 @@ class SSObject:
 
 
 ST = {}                 # symbol table
+FT = {}                 # function table
 SS = []                 # semantic stack
 PB = []                 # program block
 PS = []                 # parse stack
 TS = []                 # type stack
 SC = []                 # scope stack
-FT = []                 # function table
 nxt_tmp = 1000
 nxt_addr = 0
 sizeof = {
@@ -304,6 +304,16 @@ def subroutine(sym, inp=None):
         SS.pop()
         SS.pop()
         SS.append(SSObject('exp-addr', t))
+    if sym == '#fun-dec-start':
+        SS.append(SSObject('flag', 'params-start'))
+    if sym == '#fun-dec-end':
+        params = []
+        while SS[-1].value != 'params-start':
+            params.append(SS[-1])
+            SS.pop()
+        SS.pop()
+
+        FT[SS[-1].value] = (type, params)
 
 
 def parse_rule(rule, token_wrapper, depth):
@@ -323,7 +333,6 @@ def parse_rule(rule, token_wrapper, depth):
                 except Exception as exception:
                     errors.append((token[0], "Semantic error", str(exception)))
                     raise exception
-
             continue
         if e in terminals and e != EPS:
             if match_terminal(token, e):

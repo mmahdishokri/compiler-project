@@ -5,7 +5,7 @@ dec				->		type-spec-id dec-2
 dec-2 			-> 		var-dec
 dec-2			->		fun-dec
 var-dec			-> 		arr-spec #var-dec ;
-fun-dec			->		( params ) #fun-dec compound-stmt
+fun-dec			->		#fun-dec-start ( params ) #fun-dec-end compound-stmt
 type-spec-id	->		type-spec PID-ID
 PID-ID          ->      #pid ID
 arr-spec		->		[ #save-num NUM ]
@@ -21,7 +21,7 @@ param-list-exp	->		, param-list
 param-list-exp	->		eps
 param			-> 		type-spec PID-ID param-arr-spec
 param-arr-spec	->		[]
-param-arr-spec	->		e
+param-arr-spec	->		eps
 compound-stmt	-> 		{ dec-list stmt-list }
 stmt-list		-> 		stmt stmt-list
 stmt-list		-> 		eps
