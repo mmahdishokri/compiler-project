@@ -62,10 +62,9 @@ relop			->		<
 relop			->		==
 no-var-additive-exp->	no-var-term additive-exp-suf
 additive-exp	->		term additive-exp-suf
-additive-exp-suf->		addop additive-exp
+additive-exp-suf->		+ additive-exp #add
+additive-exp-suf->		- additive-exp #sub
 additive-exp-suf-> 		eps
-addop			->		+
-addop			->		-
 no-var-term		-> 		no-var-signed-factor term-suffix
 term			-> 		signed-factor term-suffix
 term-suffix		->		* term #mult

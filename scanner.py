@@ -248,6 +248,13 @@ def subroutine(sym, inp=None):
         SS.pop()
         SS.pop()
         SS.append(SSObject('exp-addr', t))
+
+    if sym == '#sub':
+        t = gettemp()
+        PB.append(('SUB', get_val(SS[-1]), get_val(SS[-2]), t))
+        SS.pop()
+        SS.pop()
+        SS.append(SSObject('exp-addr', t))
     if sym == '#negate':
         SS.append(SSObject('flag', 'negate'))
     if sym == '#do-negate':
@@ -406,6 +413,8 @@ for error in errors:
 
 PB.append(('PRINT', 0))
 PB.append(('PRINT', 4))
+PB.append(('PRINT', 8))
+PB.append(('PRINT', 12))
 
 print("Program Block:")
 print(PB)
