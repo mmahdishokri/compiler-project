@@ -4,11 +4,11 @@ dec-list		-> 		eps
 dec				->		type-spec-id dec-2
 dec-2 			-> 		var-dec
 dec-2			->		fun-dec
-var-dec			-> 		arr-spec ;
+var-dec			-> 		arr-spec ; #var-dec
 fun-dec			->		( params ) compound-stmt
 type-spec-id	->		type-spec ID
-arr-spec		->		[ NUM ]
-arr-spec 		->		eps
+arr-spec		->		[ #save_num NUM ]
+arr-spec 		->		eps #save_one
 type-spec		-> 		int
 type-spec		->		void
 params			->		void void-param param-list-exp
@@ -44,7 +44,7 @@ case-stmts		->		case-stmt case-stmts
 case-stmt		-> 		case NUM : stmt-list
 def-stmt		-> 		eps
 def-stmt		->		default : stmt-list
-exp				->		ID var-tof
+exp				->		#pid ID var-tof
 var-tof			-> 		arr-exp-spec var-tof-ari-funny
 var-tof			->		( args ) var-tof-ari-funny
 var-tof-ari-funny->		= exp

@@ -1,2 +1,0 @@
-#2: Syntax error! Unexpected =
-#2: Syntax error! Missing dec-2

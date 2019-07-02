@@ -1,1 +1,4 @@
-int a = 3;
+int main ( void ) {
+    int a;
+    a = 3;
+}

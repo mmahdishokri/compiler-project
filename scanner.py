@@ -135,7 +135,7 @@ def match_rule(token, rule, A):
     for r in rule:
         if r in action_symbols:
             continue
-        if r in terminals:
+        if r in terminals and r != EPS:
             return match_terminal(token, r)
         if token_value(token) in First[r]:
             return True
@@ -150,28 +150,100 @@ def print_node(A, depth):
     print(A)
 
 
-def pid():
-    SS.append(findaddr())
+class STObject:
+    def __init__(self, type, address):
+        self.type = type
+        self.address = address
+
+    def __str__(self):
+        return self.type, self.address
 
 
-def subroutine(sym):
+ST = {}
+SS = []
+PB = []
+nxt_tmp = 0
+nxt_addr = 0
+sizeof = {
+    'int': 4
+}
+
+
+def allocate_address(size):
+    global nxt_addr
+    res = nxt_addr
+    nxt_addr += size
+    return res
+
+
+def declare_int(inp, len):
+    address = allocate_address(sizeof['int']*len)
+    ST[inp] = STObject('int', address)
+
+
+def findaddr(inp):
+    return ST[inp].address
+
+
+def gettemp():
+    global nxt_tmp
+    res = nxt_tmp
+    nxt_tmp += sizeof['int']
+    return res
+
+
+def pid(inp):
+    SS.append(findaddr(inp))
+
+
+def subroutine(sym, inp=None):
     if sym == '#pid':
-        pid()
+        pid(inp)
+    if sym == '#assign':
+        PB.append((':=', SS[-1], SS[-2]))
+        SS.pop(2)
+    if sym == '#add':
+        t = gettemp()
+        PB.append(('+', SS[-1], SS[-2], t))
+        SS.pop(2)
+        SS.append(t)
+    if sym == '#save_num':
+        SS.append(inp)
+    if sym == '#save_one':
+        SS.append(1)
+    if sym == '#var-dec':
+        declare_int(SS[-2], SS[-1])
+        SS.pop()
 
 
 def parse_rule(rule, token_wrapper, depth):
     token = token_wrapper[0]
+    expect_id = False
+    expect_num = False
     for e in rule:
         if e in action_symbols:
-            subroutine(e)
+            expect_num = expect_id = False
+            if e == '#pid':
+                expect_id = True
+            elif e == '#save_num':
+                expect_num = True
+            else:
+                subroutine(e)
             continue
-        if e in terminals:
+        if e in terminals and e != EPS:
             if match_terminal(token, e):
+                if token_value(token) == 'ID':
+                    if expect_id:
+                        subroutine('#pid', token[2])
+                    SS.append(token[2])
+                if token_value(token) == 'NUM':
+                    if expect_num:
+                        subroutine('#save_num', int(token[2]))
                 print_node(token_value(token), depth + 1)
                 token_wrapper[0] = token = read_token()
             else:
                 if e == EOF:
-                    errors.append((token[0], "Syntax error", 'Malfored Input'))
+                    errors.append((token[0], "Syntax error", 'Malformed Input'))
                     raise Exception('EOF Error')
                 errors.append((token[0], "Syntax error", 'Missing ' + e))
         elif e in non_terminals:
@@ -186,17 +258,19 @@ def parse_rule(rule, token_wrapper, depth):
             else:
                 parse_non_terminal(e, token_wrapper, depth + 1)
             token = token_wrapper[0]
-        else:
+        elif e != EPS:
             print("PANIC")
             raise Exception("rule exception")
+        expect_id = False
+        expect_num = False
 
 
 def parse_non_terminal(A, token_wrapper, depth=0):
     print_node(A, depth)
     token = token_wrapper[0]
     # TODO: CHECK THE NEXT CONDITION!!
-    if EPS in First[A] and token_value(token) in Follow[A]:
-        return
+    # if EPS in First[A] and token_value(token) in Follow[A]:
+    #   return
     for r in Rules[A]:
         if match_rule(token, r, A):
             parse_rule(r, token_wrapper, depth)
@@ -205,12 +279,13 @@ def parse_non_terminal(A, token_wrapper, depth=0):
     raise Exception("non terminal exception")
 
 
-print("Hello! I am your scanner ^_O")
-code = open("All Tests/Parser/Test Error - 2", "r")
+print("\nHello! I am your scanner, parser, semantic analyser, and intermediate code generator! ^_O\n")
+
+print("Here is your parse tree:")
+
+code = open("All Tests/Parser/My_Test.txt", "r")
 tokens = []
 errors = []
-SS = []
-PB = [[] for i in range(100)]
 state = 0
 word_wrapper = [""]
 line_number_wrapper = [1]
