@@ -52,7 +52,7 @@ var-tof			->		( args ) var-tof-ari-funny
 var-tof-ari-funny->		= exp #assign
 var-tof-ari-funny->		term-suffix additive-exp-suf simple-exp-suff
 var				-> 		PID-ID arr-exp-spec
-arr-exp-spec	-> 		[ exp ]
+arr-exp-spec	-> 		[ exp ] #arr-ref
 arr-exp-spec	->		eps
 no-var-simple-exp->		no-var-additive-exp simple-exp-suff
 simple-exp		-> 		additive-exp simple-exp-suff

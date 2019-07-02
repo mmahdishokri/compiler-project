@@ -160,12 +160,13 @@ class STObject:
 
 
 class SSObject:
-    def __init__(self, type, value):
+    def __init__(self, type, value, indirect=False):
         self.type = type
         self.value = value
+        self.indirect = indirect
 
     def __str__(self):
-        return self.type, self.value
+        return self.type, self.value, self.indirect
 
 
 ST = {}                 # symbol table
@@ -235,6 +236,8 @@ def pid(inp, def_type = ''):
 def get_val(x):
     if x.type == 'cons':
         return '#' + str(x.value)
+    if x.indirect:
+        return '@' + str(x.value)
     return x.value
 
 
@@ -249,10 +252,10 @@ def subroutine(sym, inp=None):
         pid(inp)
     if sym == '#assign':
         val = SS[-2]
-        PB.append(('ASSIGN', get_val(SS[-1]), val.value))
+        PB.append(('ASSIGN', get_val(SS[-1]), get_val(val)))
         SS.pop()
         SS.pop()
-        SS.append(SSObject('expr-ret', val.value))
+        SS.append(SSObject('exp-addr', val.value, val.indirect))
     if sym == '#add':
         t = gettemp()
         check_int(SS[-1])
@@ -280,7 +283,7 @@ def subroutine(sym, inp=None):
             SS.pop()
             SS.append(SSObject('exp-addr', t))
         else:
-            PB.append(('SUB', '#0', get_val(SS[-1]), SS[-1].value))
+            PB.append(('SUB', '#0', get_val(SS[-1]), get_val(SS[-1])))
         assert SS[-2].value == 'negate'
         SS.pop(-2)
     if sym == '#save-num':
@@ -312,8 +315,15 @@ def subroutine(sym, inp=None):
             params.append(SS[-1])
             SS.pop()
         SS.pop()
-
         FT[SS[-1].value] = (type, params)
+    if sym == '#arr-ref':
+        check_int(SS[-1])
+        t = gettemp()
+        PB.append(('MULT', get_val(SS[-1]), '#4', t))
+        PB.append(('ADD', '#'+str(SS[-2].value), t, t))
+        SS.pop()
+        SS.pop()
+        SS.append(SSObject('exp-addr', t, True))
 
 
 def parse_rule(rule, token_wrapper, depth):
