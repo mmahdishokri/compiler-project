@@ -99,4 +99,4 @@ while not fin:
                 else:
                     first = First[X].copy()
                     f = False
-#print(Follow['dec-list'])
+# print(Follow['dec-list'])
