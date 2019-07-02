@@ -246,8 +246,15 @@ def check_int(x):
         raise Exception('Type mismatch in operands.')
 
 
+def print_ss():
+    for s in SS:
+        print('(' + str(s.type), str(s.value), str(s.indirect)+')', end=', ')
+    print()
+
+
 def subroutine(sym, inp=None):
     print('subroutine!! o|^_^|o ', sym)
+    print_ss()
 
     if sym == '#pid':
         pid(inp)
@@ -299,7 +306,6 @@ def subroutine(sym, inp=None):
         SS.append(SSObject('cons', 1))
 
     if sym == '#var-dec':
-        print('var dec!!', SS, PS, inp)
         if TS[-1] == 'void':
             raise Exception('Illegal type of void. For variable: ' + str(SS[-2].value))
         declare_int(SS[-2].value, SS[-1].value)
@@ -357,7 +363,7 @@ def subroutine(sym, inp=None):
 
     if sym == '#while':
         PB[SS[-1].value] = (('JPF', get_val(SS[-2]), len(PB) + 1))
-        PB.append(('JP', SS[-2].value))
+        PB.append(('JP', SS[-3].value))
         SS.pop()
         SS.pop()
         SS.pop()
