@@ -7,8 +7,8 @@ dec-2			->		fun-dec
 var-dec			-> 		arr-spec ; #var-dec
 fun-dec			->		( params ) compound-stmt
 type-spec-id	->		type-spec ID
-arr-spec		->		[ #save_num NUM ]
-arr-spec 		->		eps #save_one
+arr-spec		->		[ #save-num NUM ]
+arr-spec 		->		eps #save-one
 type-spec		-> 		int
 type-spec		->		void
 params			->		void void-param param-list-exp

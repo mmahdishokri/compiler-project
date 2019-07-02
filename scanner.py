@@ -207,9 +207,9 @@ def subroutine(sym, inp=None):
         PB.append(('+', SS[-1], SS[-2], t))
         SS.pop(2)
         SS.append(t)
-    if sym == '#save_num':
+    if sym == '#save-num':
         SS.append(inp)
-    if sym == '#save_one':
+    if sym == '#save-one':
         SS.append(1)
     if sym == '#var-dec':
         declare_int(SS[-2], SS[-1])
@@ -225,7 +225,7 @@ def parse_rule(rule, token_wrapper, depth):
             expect_num = expect_id = False
             if e == '#pid':
                 expect_id = True
-            elif e == '#save_num':
+            elif e == '#save-num':
                 expect_num = True
             else:
                 subroutine(e)
@@ -238,7 +238,7 @@ def parse_rule(rule, token_wrapper, depth):
                     SS.append(token[2])
                 if token_value(token) == 'NUM':
                     if expect_num:
-                        subroutine('#save_num', int(token[2]))
+                        subroutine('#save-num', int(token[2]))
                 print_node(token_value(token), depth + 1)
                 token_wrapper[0] = token = read_token()
             else:
@@ -322,3 +322,7 @@ for error in errors:
     error_file.write('#' + str(error[0]) + ': ')
     error_file.write(error[1] + '! ' + error[2] + '\n')
     lastLine = error[0]
+
+
+print("Program Block:")
+print(PB)
