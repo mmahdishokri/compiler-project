@@ -207,13 +207,16 @@ def gettemp():
     return res
 
 
-def pid(inp):
+def pid(inp, def_type = ''):
     pid_type = 'hoy'
-    for i in range(len(PS)):
-        x = PS[-i - 1]
-        if x in ['dec-list', 'params', 'stmt-list']:
-            pid_type = x
-            break
+    if def_type != '':
+        pid_type = def_type
+    else:
+        for i in range(len(PS)):
+            x = PS[-i - 1]
+            if x in ['dec-list', 'params', 'stmt-list']:
+                pid_type = x
+                break
     print('pid!! type = ', pid_type)
     if pid_type == 'dec-list':
         SS.append(SSObject((TS[-1], 'id-name'), inp))
@@ -241,16 +244,23 @@ def subroutine(sym, inp=None):
         SS.pop()
     if sym == '#add':
         t = gettemp()
-        PB.append(('ADD', SS[-1].value, SS[-2].value, t))
+        PB.append(('ADD', get_val(SS[-1]), get_val(SS[-2]), t))
         SS.pop()
         SS.pop()
         SS.append(SSObject('exp-addr', t))
     if sym == '#negate':
         SS.append(SSObject('flag', 'negate'))
-    if sym == '#save-num':
-        if SS[-1].value == 'negate':
-            inp = -int(inp)
+    if sym == '#do-negate':
+        if SS[-1].type == 'cons':
+            t = gettemp()
+            PB.append(('SUB', '#0', get_val(SS[-1]), t))
             SS.pop()
+            SS.append(SSObject('exp-ret', t))
+        else:
+            PB.append(('SUB', '#0', get_val(SS[-1]), SS[-1].value))
+        assert SS[-2].value == 'negate'
+        SS.pop(-2)
+    if sym == '#save-num':
         SS.append(SSObject('cons', inp))
     if sym == '#save-one':
         SS.append(SSObject('cons', 1))
@@ -386,6 +396,8 @@ for error in errors:
     error_file.write(error[1] + '! ' + error[2] + '\n')
     lastLine = error[0]
 
+
+PB.append(('PRINT', 8))
 
 print("Program Block:")
 print(PB)

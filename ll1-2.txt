@@ -72,10 +72,10 @@ term-suffix		->		* term
 term-suffix		->		eps
 no-var-signed-factor->	no-var-factor
 no-var-signed-factor->	+ factor
-no-var-signed-factor->	- #negate factor
+no-var-signed-factor->	- #negate factor #do-negate
 signed-factor	->		factor
 signed-factor	->		+ factor
-signed-factor	->		- #negate factor
+signed-factor	->		- #negate factor #do-negate
 no-var-factor	->		( exp )
 no-var-factor	->		#save-num NUM
 factor			->		( exp )
