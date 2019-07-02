@@ -173,6 +173,7 @@ SS = []                 # semantic stack
 PB = []                 # program block
 PS = []                 # parse stack
 TS = []                 # type stack
+SC = []                 # scope stack
 nxt_tmp = 1000
 nxt_addr = 0
 sizeof = {
@@ -194,6 +195,8 @@ def declare_int(inp, len):
 
 
 def findaddr(inp):
+    if inp not in ST:
+        raise Exception('Variable ' + str(inp) + ' not defined.')
     return ST[inp].address
 
 
@@ -242,7 +245,12 @@ def subroutine(sym, inp=None):
         SS.pop()
         SS.pop()
         SS.append(SSObject('exp-addr', t))
+    if sym == '#negate':
+        SS.append(SSObject('flag', 'negate'))
     if sym == '#save-num':
+        if SS[-1].value == 'negate':
+            inp = -int(inp)
+            SS.pop()
         SS.append(SSObject('cons', inp))
     if sym == '#save-one':
         SS.append(SSObject('cons', 1))

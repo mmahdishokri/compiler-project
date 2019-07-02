@@ -1,10 +1,13 @@
 int main ( void ) {
     int a;
-    void b;
-    int c;
-    int d;
+    int b;
     a = 3;
     b = 2;
-    c = 1;
-    d = 0;
+    {
+        int c;
+        int d;
+        c = 1;
+        d = -1;
+        d = -2;
+    }
 }
