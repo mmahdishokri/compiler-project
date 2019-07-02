@@ -352,6 +352,16 @@ def subroutine(sym, inp=None):
     if sym == '#jp':
         PB[SS[-1].value] = ('JP', len(PB))
 
+    if sym == '#label':
+        SS.append(SSObject('cons', len(PB)))
+
+    if sym == '#while':
+        PB[SS[-1].value] = (('JPF', get_val(SS[-2]), len(PB) + 1))
+        PB.append(('JP', SS[-2].value))
+        SS.pop()
+        SS.pop()
+        SS.pop()
+
 
 def parse_rule(rule, token_wrapper, depth):
     token = token_wrapper[0]
@@ -493,3 +503,4 @@ for command in PB:
     output_file.write(', ' + str(command[1]))
     output_file.write(', ' + str(command[2]))
     output_file.write(', ' + str(command[3]) + ')\n')
+    command_number = command_number + 1
