@@ -270,6 +270,13 @@ def subroutine(sym, inp=None):
             raise Exception('Illegal type of void. For variable: ' + str(SS[-2].value))
         declare_int(SS[-2].value, SS[-1].value)
         SS.pop()
+    if sym == '#mult':
+        t = gettemp()
+        PB.append(('MULT', get_val(SS[-1]), get_val(SS[-2]), t))
+        SS.pop()
+        SS.pop()
+        SS.append(SSObject('exp-addr', t))
+
 
 
 def parse_rule(rule, token_wrapper, depth):
@@ -397,7 +404,8 @@ for error in errors:
     lastLine = error[0]
 
 
-PB.append(('PRINT', 8))
+PB.append(('PRINT', 0))
+PB.append(('PRINT', 4))
 
 print("Program Block:")
 print(PB)

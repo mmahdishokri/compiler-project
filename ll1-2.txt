@@ -68,7 +68,7 @@ addop			->		+
 addop			->		-
 no-var-term		-> 		no-var-signed-factor term-suffix
 term			-> 		signed-factor term-suffix
-term-suffix		->		* term
+term-suffix		->		* term #mult
 term-suffix		->		eps
 no-var-signed-factor->	no-var-factor
 no-var-signed-factor->	+ factor
