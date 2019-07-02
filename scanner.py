@@ -176,7 +176,8 @@ TS = []                 # type stack
 nxt_tmp = 1000
 nxt_addr = 0
 sizeof = {
-    'int': 4
+    'int': 4,
+    'void': 0,
 }
 
 
@@ -207,14 +208,17 @@ def pid(inp):
     pid_type = 'hoy'
     for i in range(len(PS)):
         x = PS[-i - 1]
-        if x in ['dec-list', 'param-list', 'stmt-list']:
+        if x in ['dec-list', 'params', 'stmt-list']:
             pid_type = x
             break
     print('pid!! type = ', pid_type)
     if pid_type == 'dec-list':
-        SS.append(SSObject('id-name', inp))
-    if pid_type == 'param-list':
-        SS.append(SSObject('param-name', inp))
+        SS.append(SSObject((TS[-1], 'id-name'), inp))
+    if pid_type == 'params':
+        if TS[-1] == 'void':
+            print('Illegal type of void. for ' + str(inp))
+            raise Exception('Illegal type of void. For variable: ' + str(inp))
+        SS.append(SSObject((TS[-1], 'param-name'), inp))
     if pid_type == 'stmt-list':
         SS.append(SSObject(pid_type, findaddr(inp)))
 
@@ -261,21 +265,30 @@ def parse_rule(rule, token_wrapper, depth):
             elif e == '#save-num':
                 expect_num = True
             else:
-                subroutine(e)
+                try:
+                    subroutine(e)
+                except Exception as exception:
+                    errors.append((token[0], "Semantic error", str(exception)))
+                    raise exception
+
             continue
         if e in terminals and e != EPS:
             if match_terminal(token, e):
                 if token_value(token) == 'ID':
                     if expect_id:
-                        subroutine('#pid', token[2])
-                    else:
-                        print('Unexpected ID!! PANIC!!')
+                        try:
+                            subroutine('#pid', token[2])
+                        except Exception as exception:
+                            errors.append((token[0], "Semantic error", str(exception)))
+                            raise exception
                     # SS.append(token[2])                WHY??
                 if token_value(token) == 'NUM':
                     if expect_num:
                         subroutine('#save-num', int(token[2]))
                 print_node(token_value(token), depth + 1)
                 PS.append(token_value(token))
+                if token[2] in ['int', 'void']:
+                    TS.append(token[2])
                 token_wrapper[0] = token = read_token()
             else:
                 if e == EOF:
@@ -368,11 +381,11 @@ for error in errors:
 print("Program Block:")
 print(PB)
 
-command_numer = 0
+command_number = 0
 for command in PB:
     command = list(command)
     command.extend(['']*(4 - len(command)))
-    output_file.write(str(command_numer) + '\t(' + str(command[0]))
+    output_file.write(str(command_number) + '\t(' + str(command[0]))
     output_file.write(', ' + str(command[1]))
     output_file.write(', ' + str(command[2]))
     output_file.write(', ' + str(command[3]) + ')\n')
