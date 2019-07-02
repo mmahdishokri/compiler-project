@@ -47,7 +47,7 @@ def-stmt		->		default : stmt-list
 exp				->		#pid ID var-tof
 var-tof			-> 		arr-exp-spec var-tof-ari-funny
 var-tof			->		( args ) var-tof-ari-funny
-var-tof-ari-funny->		= exp
+var-tof-ari-funny->		= exp #assign
 var-tof-ari-funny->		term-suffix additive-exp-suf simple-exp-suff
 exp				->		no-var-simple-exp
 var				-> 		ID arr-exp-spec
