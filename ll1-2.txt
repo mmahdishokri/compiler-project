@@ -32,10 +32,10 @@ stmt			->		iteration-stmt
 stmt			->		return-stmt
 stmt			->		switch-stmt
 exp-stmt		-> 		exp ; #pop
-exp-stmt		-> 		continue ;
-exp-stmt		-> 		break ;
+exp-stmt		-> 		continue ; #continue
+exp-stmt		-> 		break ; #break
 selection-stmt	-> 		if ( exp ) #save-pb stmt else #jpf-save stmt #jp
-iteration-stmt	->		while #label ( exp ) #save-pb stmt #while
+iteration-stmt	->		while #while-start #label ( exp ) #save-pb stmt #while
 return-stmt		->		return can-void-exp ;
 can-void-exp	->		exp
 can-void-exp	->		eps

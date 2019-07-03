@@ -176,6 +176,7 @@ PB = []                 # program block
 PS = []                 # parse stack
 TS = []                 # type stack
 SC = []                 # scope stack
+WS = []                 # while stack
 nxt_tmp = 1000
 nxt_addr = 0
 sizeof = {
@@ -233,6 +234,14 @@ def pid(inp, def_type = ''):
             SS.append(SSObject('fun-addr', findaddr(inp)))
 
 
+def check_while(inp):
+    for i in range(len(WS)):
+        if WS[-i - 1] == 'new-while!':
+            return True
+        if WS[-i - 1] == 'new func!':
+            raise Exception('No ’while ’ found for ’' + inp + '’.')
+    raise Exception('No ’while ’ found for ’' + inp + '’.')
+
 def get_val(x):
     if x.type == 'cons':
         return '#' + str(x.value)
@@ -255,6 +264,7 @@ def print_ss():
 def subroutine(sym, inp=None):
     print('subroutine!! o|^_^|o ', sym)
     print_ss()
+    print(PB)
 
     if sym == '#pid':
         pid(inp)
@@ -357,16 +367,37 @@ def subroutine(sym, inp=None):
 
     if sym == '#jp':
         PB[SS[-1].value] = ('JP', len(PB))
+        SS.pop()
 
     if sym == '#label':
         SS.append(SSObject('cons', len(PB)))
 
+    if sym == '#while-start':
+        WS.append('new-while!')
+
     if sym == '#while':
         PB[SS[-1].value] = (('JPF', get_val(SS[-2]), len(PB) + 1))
         PB.append(('JP', SS[-3].value))
+        while len(WS) > 0 and WS[-1] != 'new-while!':
+            if WS[-1][0] == 'continue':
+                PB[int(WS[-1][1])] = (('JP', SS[-3].value))
+            else:
+                PB[int(WS[-1][1])] = (('JP', len(PB)))
+            WS.pop()
+        WS.pop()
         SS.pop()
         SS.pop()
         SS.pop()
+
+    if sym == '#continue':
+        check_while('continue')
+        WS.append(('continue', len(PB)))
+        PB.append(())
+
+    if sym == '#break':
+        check_while('break')
+        WS.append(('break', len(PB)))
+        PB.append(())
 
     if sym == '#lt':
         t = gettemp()

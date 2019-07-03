@@ -1,13 +1,10 @@
 int main ( void ) {
-    int prod;
-    int i;
-    int cond;
-    prod = 1;
-    i = 1;
-    cond = 1;
-    while(1 < cond) {
-        prod = i * prod;
-        i = i + 2;
-        cond = 0;
+    int a;
+    a = 1;
+    while(a < 5) {
+        if(a == 3)
+            a = a + 10;
+        else
+            a = a + 1;
     }
 }
