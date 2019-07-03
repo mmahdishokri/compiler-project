@@ -5,7 +5,7 @@ int main ( void ) {
     prod = 1;
     i = 1;
     cond = 1;
-    while(cond) {
+    while(1 < cond) {
         prod = i * prod;
         i = i + 2;
         cond = 0;

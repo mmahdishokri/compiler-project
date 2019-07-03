@@ -368,6 +368,20 @@ def subroutine(sym, inp=None):
         SS.pop()
         SS.pop()
 
+    if sym == '#lt':
+        t = gettemp()
+        PB.append(('LT', get_val(SS[-2]), get_val(SS[-1]), t))
+        SS.pop()
+        SS.pop()
+        SS.append(SSObject('exp-addr', t))
+
+    if sym == '#eq':
+        t = gettemp()
+        PB.append(('EQ', get_val(SS[-2]), get_val(SS[-1]), t))
+        SS.pop()
+        SS.pop()
+        SS.append(SSObject('exp-addr', t))
+
 
 def parse_rule(rule, token_wrapper, depth):
     token = token_wrapper[0]

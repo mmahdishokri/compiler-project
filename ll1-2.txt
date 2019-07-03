@@ -56,10 +56,9 @@ arr-exp-spec	-> 		[ exp ] #arr-ref
 arr-exp-spec	->		eps
 no-var-simple-exp->		no-var-additive-exp simple-exp-suff
 simple-exp		-> 		additive-exp simple-exp-suff
-simple-exp-suff	->		relop additive-exp
+simple-exp-suff	->		< additive-exp #lt
+simple-exp-suff	->		== additive-exp #eq
 simple-exp-suff	->		eps
-relop			->		<
-relop			->		==
 no-var-additive-exp->	no-var-term additive-exp-suf
 additive-exp	->		term additive-exp-suf
 additive-exp-suf->		+ additive-exp #add
