@@ -1,8 +1,8 @@
 todo:
 	rel					[Done!]
-	continue
-	break
-	print
+	continue			[Done!]
+	break				[Done!]
+	print				[Done!]
 	main
 	scoping
 	switch-case

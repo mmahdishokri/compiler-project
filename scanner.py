@@ -413,6 +413,10 @@ def subroutine(sym, inp=None):
         SS.pop()
         SS.append(SSObject('exp-addr', t))
 
+    if sym == '#print':
+        check_int(SS[-1])
+        PB.append(('PRINT', get_val(SS[-1])))
+
 
 def parse_rule(rule, token_wrapper, depth):
     token = token_wrapper[0]
@@ -537,11 +541,6 @@ for error in errors:
     error_file.write(error[1] + '! ' + error[2] + '\n')
     lastLine = error[0]
 
-
-PB.append(('PRINT', 0))
-PB.append(('PRINT', 4))
-PB.append(('PRINT', 8))
-PB.append(('PRINT', 12))
 
 print("Program Block:")
 print(PB)
