@@ -180,6 +180,7 @@ TS = []                 # type stack
 SC = []                 # scope stack
 WS = []                 # while stack
 scope_id = ('@@@@')
+scope_list = ['@@@@']
 nxt_tmp = 1000
 nxt_addr = 0
 sizeof = {
@@ -462,9 +463,11 @@ def parse_rule(rule, token_wrapper, depth):
                     TS.append(token[2])
                 global scope_id
                 if token[2] == '{':
+                    scope_list.append(str(token[0]))
                     scope_id = scope_id + (str(token[0]))
                 if token[2] == '}':
-                    scope_id = scope_id[:-1]
+                    scope_id = scope_id[:-len(scope_list[-1])]
+                    scope_list.pop()
 
                 token_wrapper[0] = token = read_token()
             else:
