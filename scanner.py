@@ -154,9 +154,11 @@ class STObject:
     def __init__(self, type, address):
         self.type = type
         self.address = address
+        global scope_id
+        self.scope = scope_id
 
     def __str__(self):
-        return self.type, self.address
+        return self.type, self.address, self.scope
 
 
 class SSObject:
@@ -177,6 +179,7 @@ PS = []                 # parse stack
 TS = []                 # type stack
 SC = []                 # scope stack
 WS = []                 # while stack
+scope_id = ('@@@@')
 nxt_tmp = 1000
 nxt_addr = 0
 sizeof = {
@@ -200,6 +203,9 @@ def declare_int(inp, len):
 def findaddr(inp):
     if inp not in ST:
         raise Exception('Variable ' + str(inp) + ' not defined.')
+    if not str(scope_id).startswith(str(ST[inp].scope)):
+        raise Exception('Variable ' + str(inp) + ' not defined.')
+    print('var', inp, 'scope = ', ST[inp].scope, 'cur scope = ', scope_id)
     return ST[inp].address
 
 
@@ -265,6 +271,7 @@ def subroutine(sym, inp=None):
     print('subroutine!! o|^_^|o ', sym)
     print_ss()
     print(PB)
+    print(scope_id)
 
     if sym == '#pid':
         pid(inp)
@@ -453,6 +460,12 @@ def parse_rule(rule, token_wrapper, depth):
                 PS.append(token_value(token))
                 if token[2] in ['int', 'void']:
                     TS.append(token[2])
+                global scope_id
+                if token[2] == '{':
+                    scope_id = scope_id + (str(token[0]))
+                if token[2] == '}':
+                    scope_id = scope_id[:-1]
+
                 token_wrapper[0] = token = read_token()
             else:
                 if e == EOF:
