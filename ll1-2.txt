@@ -12,16 +12,16 @@ arr-spec		->		[ #save-num NUM ]
 arr-spec 		->		eps #save-one
 type-spec		-> 		int
 type-spec		->		void
-params			->		void void-param param-list-exp
-params			->		int PID-ID param-list-exp
+params			->		void void-param
+params			->		int PID-ID param-arr-spec #var-dec param-list-exp
 void-param		->		eps
-void-param		->		PID-ID
+void-param		->		PID-ID param-list-exp #var-dec
 param-list		->		param param-list-exp
 param-list-exp	->		, param-list
 param-list-exp	->		eps
-param			-> 		type-spec PID-ID param-arr-spec
-param-arr-spec	->		[]
-param-arr-spec	->		eps
+param			-> 		type-spec PID-ID param-arr-spec #var-dec
+param-arr-spec	->		[] #save-one
+param-arr-spec	->		eps #save-one
 compound-stmt	-> 		{ dec-list stmt-list }
 stmt-list		-> 		stmt stmt-list
 stmt-list		-> 		eps

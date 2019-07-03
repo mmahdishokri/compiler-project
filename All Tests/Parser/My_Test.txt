@@ -1,22 +1,8 @@
-int main ( void ) {
-    int a;
-    int b;
+void main ( void ) {
+int a;
+int b;
     a = 1;
-
-
-
-
-
-
-
-    while(a < 3) {
-        int c;
-        c = 2;
-        b = 2;
-        a = a + 1;
-        output(b);
-        output(c);
-    }
+    b = 2;
     output(b);
     output(a);
 }

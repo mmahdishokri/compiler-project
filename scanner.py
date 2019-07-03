@@ -198,7 +198,9 @@ def allocate_address(size):
 
 def declare_int(inp, len):
     address = allocate_address(sizeof['int']*len)
+    print('dec:', inp, address)
     ST[inp] = STObject('int', address)
+    return address
 
 
 def findaddr(inp):
@@ -326,9 +328,15 @@ def subroutine(sym, inp=None):
     if sym == '#var-dec':
         if TS[-1] == 'void':
             raise Exception('Illegal type of void. For variable: ' + str(SS[-2].value))
-        declare_int(SS[-2].value, SS[-1].value)
-        SS.pop()
-        SS.pop()
+        name = declare_int(SS[-2].value, SS[-1].value)
+
+        if SS[-2].type == ('int', 'param-name'):
+            SS.pop()
+            SS.pop()
+            SS.append(SSObject('param-res', name))
+        else:
+            SS.pop()
+            SS.pop()
 
     if sym == '#pop':
         SS.pop()
@@ -343,15 +351,17 @@ def subroutine(sym, inp=None):
         SS.append(SSObject('exp-addr', t))
 
     if sym == '#fun-dec-start':
-        SS.append(SSObject('flag', 'params-start'))
+        SS.append(SSObject(('flag', TS[-1]), 'params-start'))
 
     if sym == '#fun-dec-end':
         params = []
         while SS[-1].value != 'params-start':
             params.append(SS[-1])
             SS.pop()
+        FT[SS[-2].value] = (SS[-1].type[1], params)
+        print('params = ', params)
         SS.pop()
-        FT[SS[-1].value] = (type, params)
+        SS.pop()
 
     if sym == '#arr-ref':
         check_int(SS[-1])
@@ -527,6 +537,9 @@ try:
     parse_non_terminal(START_NON_TERMINAL, [read_token()])
 except Exception as e:
     print('Parsing terminated due to an error:', e)
+
+if 'main' not in FT or FT['main'] != ('void', []):
+    errors.append((tokens[-1][0], "Semantic error", 'main function not fount!'))
 
 parser_output_file = open("scanner.txt", "w")
 error_file = open("errors.txt", "w")

@@ -3,8 +3,8 @@ todo:
 	continue			[Done!]
 	break				[Done!]
 	print				[Done!]
-	main
-	scoping
-	switch-case
+	scoping				[Done!]
 	function dec
+	main				[Done!]
 	function call
+	switch-case
