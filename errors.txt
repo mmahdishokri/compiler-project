@@ -1,0 +1,2 @@
+#8: Syntax error! Unexpected int
+#8: Semantic error! Variable f not defined.

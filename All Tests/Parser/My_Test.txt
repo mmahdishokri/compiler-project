@@ -1,8 +1,11 @@
 void main ( void ) {
-int a;
-int b;
+    int a;
+    int b;
     a = 1;
     b = 2;
     output(b);
     output(a);
+    int f(int x, int y) {
+        output(x);
+    }
 }
